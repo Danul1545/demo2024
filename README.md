@@ -4,7 +4,9 @@
 | ISP            |  Gi1     |           |               |      |
 | ISP            |  Gi2     |           |               |      |
 | ISP            |  Gi3     |           |               |      |
-| HQ-R           |          |           |               |      |
-| BR-R           |          |           |               |      |
-| HQ-SRV         |          |           |               |      |
-| BR-SRV         |          |           |               |      |
+| HQ-R           |  Gi1     |           |               |      |
+| HQ-R           |  Gi2     |           |               |      |
+| BR-R           |  Gi1     |           |               |      |
+| BR-R           |  Gi2     |           |               |      |
+| HQ-SRV         |  Gi1     |           |               |      |
+| BR-SRV         |  Gi1     |           |               |      |
