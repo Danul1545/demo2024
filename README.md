@@ -1,4 +1,4 @@
-![image](https://github.com/Danul1545/demo2024/assets/148867600/372b978d-79b4-425a-8db9-e2b584bcfbda)# demo2024
+# demo2024
 
 ## №1
 
