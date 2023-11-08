@@ -32,15 +32,11 @@
 
 ### 1. Настройка интерфесов.
 
-#### Просмотр существующих интерфейсов.
-```
-ip a
-```
-#### Заходим на файл  конфигурации интерфейсов.
-```
-nano /etc/network/interfaces
-```
-#### Назначаем IP адреса в соотвествии с таблицей.
+Просмотр существующих интерфейсов  ` ip a `
+
+Заходим на файл  конфигурации интерфейсов.`nano /etc/network/interfaces`
+
+#### Назначаем IP адреса для ISP в соотвествии с таблицей.
 ```
 auto ens192
 iface ens192 inet static
@@ -50,27 +46,56 @@ gateway 10.12.25.254
 
 auto ens224
 iface ens224 inet static
-address 192.168.0.1
-netmask 255.255.255.224
+address 192.168.0.170
+netmask 255.255.255.252
 
 auto ens256
 iface ens256 inet static
-address 192.168.0.35
+address 192.168.0.164
+netmask 255.255.255.252
+```
+#### Для HQ-R
+```
+auto ens192
+iface ens192 inet static
+address 192.168.0.2
+netmask 255.255.255.128
+
+auto ens224
+iface ens192 inet static
+address 192.168.0.169
+netmask 255.255.255.252
+```
+#### Для BR-R
+```
+auto ens192
+iface ens192 inet static
+address 192.168.0.132
+netmask 255.255.255.224
+
+auto ens224
+iface ens192 inet static
+address 192.168.0.163
+netmask 255.255.255.252
+```
+#### Для HQ-SRV
+```
+auto ens192
+iface ens192 inet static
+address 192.168.0.1
+netmask 255.255.255.128
+```
+#### Для BR-SRV
+```
+auto ens192
+iface ens192 inet static
+address 192.168.0.130
 netmask 255.255.255.224
 ```
-#### Сохраняем комбинацией клавиш.
-```
-Ctrl+S
-```
-#### Выходим с комбинацией клавиш.
-```
-Ctrl+X
-```
-#### Перезагружаем сеть.
-```
-systemctl restar networking
-```
-#### Делаем тоже самое на других виртуальных машинах.
+
+Сохраняем и выходим комбинацией клавиш: `Ctrl+S` и `Ctrl+X`
+
+Перезагружаем сеть `systemctl restar networking`
 
 ### №1.2
 
@@ -80,10 +105,10 @@ systemctl restar networking
 
 #### Установка пакета frr.
 ```
+apt update
 apt-get install frr
 ```
-#### После утановки проверим состояние frr.
-```
-systemctl status frr
-```
+После утановки проверим состояние frr `systemctl status frr`
+
+
 
