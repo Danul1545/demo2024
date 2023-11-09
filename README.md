@@ -115,4 +115,5 @@ apt-get install frr
 nano /etc/frr/daemons
 ```
 
-Меняем _ospfd=no_ на: `ospfd=yes`
+Меняем _ospfd=no_ на:   ` ospfd=yes ` и перезапускаем его  `systemctl restart frr`
+
