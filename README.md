@@ -108,7 +108,11 @@ netmask 255.255.255.224
 apt update
 apt-get install frr
 ```
-После утановки проверим состояние frr `systemctl status frr`
+После утановки проверим состояние frr  `systemctl status frr`
 
+#### Заходим в конфигурацию файла frr.
+```
+nano /etc/frr/daemons
+```
 
-
+Меняем _ospfd=no_ на: `ospfd=yes`
