@@ -114,13 +114,19 @@ apt update
 apt install iptables
 ```
 
-#### Меняем строку как на фото.
-![image](https://github.com/Danul1545/demo2024/assets/148867600/574307a7-748c-487f-b4e9-31ff31a90df7)
-
-
 #### Заходим на файл конфигурации.
 ```
 nano /etc/sysctl.conf
+```
+
+#### Меняем строку как на фото.
+![image](https://github.com/Danul1545/demo2024/assets/148867600/574307a7-748c-487f-b4e9-31ff31a90df7)
+
+Проверяем что всё работает командой `sysctl -p`
+
+#### Прописываем команду
+```
+iptables -A POSTROUTING -t nat -j MASQUERADE
 ```
 
 ### №1.2
