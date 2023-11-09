@@ -115,5 +115,13 @@ apt-get install frr
 nano /etc/frr/daemons
 ```
 
-Меняем _ospfd=no_ на:   ` ospfd=yes ` и перезапускаем его  `systemctl restart frr`
+Меняем ___ospfd=no___ на:   ` ospfd=yes ` и перезапускаем его  `systemctl restart frr`
 
+Заходим в среду роутера командой `vtysh`
+
+#### Проверяем интеррфейсы.
+```
+sh int br
+```
+
+![image](https://github.com/Danul1545/demo2024/assets/148867600/6034adea-1fc6-4196-8e7a-6d25ff6cc885)
