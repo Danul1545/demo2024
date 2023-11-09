@@ -125,3 +125,5 @@ sh int br
 ```
 
 ![image](https://github.com/Danul1545/demo2024/assets/148867600/6034adea-1fc6-4196-8e7a-6d25ff6cc885)
+
+Заходим в терминал командой conf t (configuration terminal)
