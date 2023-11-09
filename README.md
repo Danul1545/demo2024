@@ -97,6 +97,17 @@ netmask 255.255.255.224
 
 Перезагружаем сеть `systemctl restar networking`
 
+### Настройка NAT на ISP, HQ-R, BR-R
+
+#### Устанавливаем зеркала для скачивания.
+```
+nano /etc/apt/sources.list
+```
+#### Добовляем в конец списка.
+```
+deb http://mirror.yandex.ru/debian/ stable main contrib non-free
+```
+
 ### №1.2
 
 ### Описание задания.
