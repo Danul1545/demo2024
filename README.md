@@ -126,4 +126,17 @@ sh int br
 
 ![image](https://github.com/Danul1545/demo2024/assets/148867600/6034adea-1fc6-4196-8e7a-6d25ff6cc885)
 
-Заходим в терминал ospf командой `conf t` (configuration terminal) `router ospf`
+Заходим в терминал ospf командой `conf t` (configuration terminal), `router ospf`
+
+#### Настраиваем ospf.
+```
+net 192.168.0.0/25 area 0
+net 192.168.0.164/30 area 0
+```
+
+#### Проверим натройку.
+```
+sh ip ospf neighbor
+```
+
+С HQ-SRV ДО BR-SRV `ping 192.168.0.130`
