@@ -198,7 +198,10 @@ nano /etc/default/isc-dhcp-server
 
 Настройка раздачи IP-адресов.
 ```
-
+subnet 192.168.0.0 netmask 255.255.255.0 {
+range 192.168.0.2 192.168.0.125;
+option domain-name-servers 8.8.8.8, 8.8.4.4;
+option routers 192.168.0.2;
 ```
 
 #### Перезапускаем службу.
