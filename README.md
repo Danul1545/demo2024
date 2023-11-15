@@ -13,7 +13,7 @@
   
 ## Топология №1.
 
-![image](https://github.com/Danul1545/demo2024/assets/148867600/e697664b-6db7-4e3d-96d5-fa8909a55724)
+![image](https://github.com/Danul1545/demo2024/assets/148867600/88bc13c3-8222-45fa-9848-3fe04e8da41d)
 
 ### Таблица №1 (разбита на подсети).
 
