@@ -129,7 +129,7 @@ nano /etc/sysctl.conf
 iptables -A POSTROUTING -t nat -j MASQUERADE
 ```
 
-### №1.2
+## №1.2
 
 ### Описание задания.
 
@@ -170,5 +170,15 @@ net 192.168.0.164/30 area 0
 ```
 sh ip ospf neighbor
 ```
+#### Общая топология сети.
+
+![image](https://github.com/Danul1545/demo2024/assets/148867600/85946a86-ea26-4c94-9bfa-60bf0495e4d2)
 
 С HQ-SRV ДО BR-SRV `ping 192.168.0.130`
+
+## №1.3
+
+### Описание задания.
+
+Настроить автоматическое распределение IP-адресов на роутере HQ-R.
+
