@@ -182,3 +182,30 @@ sh ip ospf neighbor
 
 Настроить автоматическое распределение IP-адресов на роутере HQ-R.
 
+#### Установка DHCP.
+```
+aot install isc-dhcp-server
+```
+
+#### заходим в режим конфигурации.
+```
+nano /etc/default/isc-dhcp-server
+```
+
+#### Указываем интерфейс в сторону Интернета.
+
+![image](https://github.com/Danul1545/demo2024/assets/148867600/70439aac-94b0-4c48-9946-f9aa1c29a66e)
+
+Настройка раздачи IP-адресов.
+```
+
+```
+
+#### Перезапускаем службу.
+```
+systemctl restart isc-dhcp-server.service
+```
+
+## №1.4
+
+### Описание задания.
