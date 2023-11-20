@@ -231,6 +231,20 @@ systemctl restart isc-dhcp-server.service
 | Branch admin   | P@ssw0rd |  BR-SRV, BR-R         |
 | Network admin  | P@ssw0rd |  HQ-R, BR-SRV, BR-SRV |
 
+#### Добовляем пользователя на HQ-SRV командой
+```
+useradd Admin
+```
+
+#### Задаём ему пароль.
+```
+passwd Admin
+```
+
+#### Проверям созданого пользователя.
+```
+nano /etc/passwd
+```
 
 
 
