@@ -226,7 +226,7 @@ systemctl restart isc-dhcp-server.service
 ### Таблица №2 (локальные учётные записи)
 
 | Учётная запись | Пароль   | Примечание            |
-| -------------- | -------- | --------------        |
+| :------------: | :------: | :-------------------: |
 | Admin          | P@ssw0rd |  CLI, HQ-SRV, HQ-R    |
 | Branch admin   | P@ssw0rd |  BR-SRV, BR-R         |
 | Network admin  | P@ssw0rd |  HQ-R, BR-SRV, BR-SRV |
