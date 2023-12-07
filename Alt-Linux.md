@@ -169,6 +169,10 @@ systemctl restart network
 ```
 ### Всё тоже самое повторяем на втором роутере.
 
+после настройки проверяем командой `ping`
+
+![image](https://github.com/Danul1545/demo2024/assets/148867600/cf6fddea-e2d4-45c9-8f5c-1be4ebf6c637)
+
 ## NAT с помощью firewalld ISP,HQ-R,BR-R:
 Отключить NetworkManager:
 ```
