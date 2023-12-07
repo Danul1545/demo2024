@@ -129,7 +129,7 @@ ip a
 systemctl disable network.service NetworkManager
 ```
 
-### Все тоже самое повторил на других интерфейсах
+### Всё тоже самое повторил на других интерфейсах
 
 ## Настройка тунеля между HQ-R и BR-R.
 
@@ -167,6 +167,7 @@ echo 2001:5::1/64 > /etc/net/ifaces/tun1/ipv6address
 ```
 systemctl restart network
 ```
+### Всё тоже самое повторяем на втором роутере.
 
 ## NAT с помощью firewalld ISP,HQ-R,BR-R:
 Отключить NetworkManager:
