@@ -61,7 +61,7 @@ SYSTEMD_CONTROLLED=no
 ```
 После этого задал нужный адрес на интрефейс:  
 ```
-echo 192.168.0.170/30 > /etc/net/ifaces/ens192/ipv4address
+echo xxx.xxx.xxx.xxx/xx > /etc/net/ifaces/ensxxx/ipv4address
 ```
 Если нужно добавить шлюз по умолчанию, то нужна эта команда:  
 ```
@@ -85,12 +85,12 @@ ip a
 systemctl disable network.service NetworkManager
 ```
 ---
-### Метод, если интерфейсы были добавлены после установки системы  
-Для начала создаем папку с нужным интерфейсом по этому пути:  
+### Добовление интерфейсов.  
 ```
 mkdir /etc/net/ifaces/xxx
 ```
-`Вместо x пишется нужный интерфейс`  
+`Вместо x пишется нужный интерфейс`
+
 Далее в данной папку нужно создать файл `options` со следующими параметрами:
 ```
 BOOTPROTO=static
@@ -104,13 +104,14 @@ SYSTEMD_CONTROLLED=no
 ```
 После этого задается нужный адрес на интрефейс:  
 ```
-echo 192.168.0.170/30 > /etc/net/ifaces/ens192/ipv4address
+echo xxx.xxx.xxx.xxx/xx > /etc/net/ifaces/ensxxx/ipv4address
 ```
 Если нужно добавить шлюз по умолчанию, то нужна эта команда:  
 ```
 echo default via xxx.xxx.xxx.xxx > /etc/net/ifaces/xxx/ipv4route
 ```
-`Вместо x, нужно вставить IP-адрес и номер интерфейса`  
+`Вместо x, нужно вставить IP-адрес и номер интерфейса` 
+
 Если нужно указать информацию о DNS-сервере, прописываем команду:  
 ```
 echo nameserver 8.8.8.8 > /etc/resolv.conf
@@ -127,76 +128,45 @@ ip a
 ```
 systemctl disable network.service NetworkManager
 ```
----
+
 ### Все тоже самое повторил на других интерфейсах
 
-# Модуль 1 задание 1 
-1. Выполните базовую настройку всех устройств:  
-a. Присвоить имена в соответствии с топологией  
-b. Рассчитайте IP-адресацию IPv4 и IPv6.  
-Необходимо заполнить таблицу №1, чтобы  
-эксперты могли проверить ваше рабочее место.  
-c. Пул адресов для сети офиса BRANCH - не более 16  
-d. Пул адресов для сети офиса HQ - не более 64  
+## Настройка тунеля между HQ-R и BR-R.
 
-|Имя устройства |Интерфейс |Ip-адрес     |Маска/Префикс       |Шлюз         |
-|:-------------:|:--------:|:-----------:|:-----------------:|:------------:|
-|ISP            |ens18     |10.10.201.174|/24 255.255.255.0  |10.10.201.254 |
-|               |ens19     |192.168.0.161|/30 255.255.255.252|              |
-|               |ens20     |192.168.0.165|/30 255.255.255.252|              |
-|BR-R           |ens18     |192.168.0.162|/30 255.255.255.252|192.168.0.161 |
-|               |ens19     |192.168.100.1|/27 255.255.255.224|              |
-|HQ-R           |ens18     |192.168.0.166|/30 255.255.255.252|192.168.0.165 |
-|               |ens19     |192.168.0.1  |/25 255.255.255.128|              |
-|BR-SRV         |ens18     |192.168.100.2|/27 255.255.255.224|192.168.100.1 |
-|HQ-SRV         |ens18     |192.168.0.2  |/25 255.255.255.128|192.168.0.1   |
+Создаём новый интерфейс.
+```
+mkdir /etc/net/ifaces/tun1
+```
+Заходим в настройки итерфейса
+```
+vim /etc/net/ifaces/tun1/options
+```
+Пишем такие настройки:
 
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/3412d3b9-7b67-4fc1-8cc9-9b0ac66ff7dc)
+```
+TYPE=iptun
+TUNTUPE=gre
+TUNLOCAL=xxx.xxx.xxx.xxx
+TUNREMOUTE=xxx.xxx.xxx.xxx
+TUNOPTIONS='ttl 64'
+HOST=ensxx
+```
+`вместо x пишем ip и интерфейс 2 роутеров.`
 
-## HQ-SRV
-Смотрим название адаптера:
+Назначаем ip для тунеля:
 ```
-ip -с a
+echo 172.16.100.1/24 > /etc/net/ifaces/tun1/ipv4address
 ```
-> -c выводит информацию с цветом
+Также назначаем ipv6:
+```
+echo 2001:5::1/64 > /etc/net/ifaces/tun1/ipv6address
+```
+И перезапускаем сеть.
+```
+systemctl restart network
+```
 
-`ens18`  
-Настройка ip-адреса:  
-```
-echo 192.168.0.40/25 > /etc/net/ifaces/ens18/ipv4address
-```
-Настройка шлюза по умолчанию: 
-```
-echo default via 192.168.0.1 > /etc/net/ifaces/ens18/ipv4route
-```
-Параметры интерфейса:
-```
-nano /etc/net/ifaces/ens18/options
-```
-```
-BOOTPROTO=static
-TYPE=eth
-NM_CONTROLLED=yes
-DISABLED=no
-CONFIG_IPV4=yes
-```
-DNS-сервер:
-```
-echo nameserver 8.8.8.8 > /etc/resolv.conf
-```
-Создание нового интерфейса (предположительно свериться в ip a):
-```
-cp /etc/net/ifaces/ens18 /etc/net/ifaces/ens19
-```
-Перезагрузка адаптера:
-```
-service network restart
-```
-или
-```
-systemctl restart network.service
-```
-# NAT с помощью firewalld ISP,HQ-R,BR-R:
+## NAT с помощью firewalld ISP,HQ-R,BR-R:
 Отключить NetworkManager:
 ```
 systemctl disable network.service NetworkManager
