@@ -108,40 +108,27 @@ source .env/bin/activate
 
 Если нет расширения, то устанавливаем
 
-<p align="center">
-  <img src="./pic1.png">
-</p>
+![pic1](https://github.com/Danul1545/demo2024/assets/148867600/9051751a-3ace-431b-bcdb-1d5bc9649e9d)
 
 Жмакаем на плюсик и добавляем свою виртуалку в список SSH подключений
 
-<p align="center">
-  <img src="./pic2.png">
-</p>
+![pic2](https://github.com/Danul1545/demo2024/assets/148867600/44255c6a-c990-43b7-a6c4-fd617dbd4843)
 
-<p align="center">
-  <img src="./pic3.png">
-</p>
+![pic3](https://github.com/Danul1545/demo2024/assets/148867600/5f6a4b80-d9b2-4396-9934-67a53826492c)
 
 Обнавляем список подключений
 
-<p align="center">
-  <img src="./pic4.png">
-</p>
+![pic4](https://github.com/Danul1545/demo2024/assets/148867600/7cee86d9-4f5a-44d7-8f39-4c9026324cc6)
 
 Добавляем папку которая находится на удаленном устройстве
 
-<p align="center">
-  <img src="./pic5.png">
-</p>
+![pic5](https://github.com/Danul1545/demo2024/assets/148867600/c631b073-6341-460b-87c4-5c9a650c60ce)
 
-<p align="center">
-  <img src="./pic6.png">
-</p>
+![pic6](https://github.com/Danul1545/demo2024/assets/148867600/ae985544-14f4-4046-b504-21c230543b6f)
 
 Ждем, когда на виртуалку установится VSCode
 
 Открываем папку `ansible`, если папки не существует, то создаем ее
 
-<p align="center">
-  <img src="./pic7.png">
-</p>
+![pic7](https://github.com/Danul1545/demo2024/assets/148867600/1a51d8e8-451b-421b-88be-cb9d171ca44e)
+
