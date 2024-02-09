@@ -27,10 +27,7 @@ apt-get install wget
 cd /tmp/
 wget https://www.python.org/ftp/python/3.12.1/Python-3.12.1.tgz
 ```
-
-<p align="center">
-  <img src="./pic1.png">
-</p>
+https://github.com/Danul1545/demo2024-1/blob/main/ansible/init/installPython3.12/pic1.png
 
 Разархивируем полученный файл
 
@@ -79,9 +76,7 @@ rm -rf /usr/local/bin/Python-3.12.1
 python3.12
 ```
 
-<p align="center">
-  <img src="./pic2.png">
-</p>
+https://github.com/Danul1545/demo2024-1/blob/main/ansible/init/installPython3.12/pic2.png
 
 # Создание виртуального окружения Python
 
@@ -106,6 +101,4 @@ source .env/bin/activate
 ```
 
 Должно получиться так
-<p align="center">
-  <img src="./pic1.png">
-</p>
+https://github.com/Danul1545/demo2024-1/blob/main/ansible/init/createVirtualEnv/pic1.png
