@@ -132,3 +132,15 @@ source .env/bin/activate
 
 ![pic7](https://github.com/Danul1545/demo2024/assets/148867600/1a51d8e8-451b-421b-88be-cb9d171ca44e)
 
+# Установка ansible
+
+В `VSCode` откройте терминал.
+Проверьте что вы находитесь в папке `ansible` и у вас активированно виртуальное оркужение
+
+![pic1](https://github.com/Danul1545/demo2024/assets/148867600/c1622b12-4efc-4983-9198-35c74ad9ae44)
+
+`Ansible` это пакет `python`. Пакет можно установить при помощи утилиты командной строки `pip`
+
+```
+pip install ansible
+```
