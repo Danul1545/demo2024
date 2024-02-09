@@ -75,8 +75,8 @@ rm -rf /usr/local/bin/Python-3.12.1
 ```
 python3.12
 ```
-
-https://github.com/Danul1545/demo2024-1/blob/main/ansible/init/installPython3.12/pic2.png
+[
+https://github.com/Danul1545/demo2024-1/blob/main/ansible/init/installPython3.12/pic2.png](https://github.com/Danul1545/demo2024-1/blob/main/ansible/init/installPython3.12/pic2.png)
 
 # Создание виртуального окружения Python
 
