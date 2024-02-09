@@ -247,3 +247,272 @@ sed -i -e 's/#PermitRootLogin without_password/PermitRootLogin yes/g' /etc/opens
 ```
 ssh root@10.15.15.2
 ```
+
+### Изменение hostname на виртуальной машине через ESXi
+
+Для того, чтобы данный способ работал нужно на виртуалку установить `open-vm-tools-desktop`
+
+В папке с виртуальным окружение создайте `playbook` с название `changeHostname.yaml`
+
+```
+---
+
+- name: show version
+  hosts: esxi
+  connection: local
+  tasks:
+    - name: Change hostname of guest machine
+      community.vmware.vmware_vm_shell:
+        validate_certs: no
+        hostname: "10.12.66.1"  # IP вашего ESXi
+        username: "root" # Имя пользователя для ESXi
+        password: "P@ssw0rd" # Пароль пользователя для ESXi
+        vm_id: "DEMO-ISP - 5001" # Имя виртуальной машины
+        vm_username: root # Имя пользователя для виртуальной машины
+        vm_password: P@ssw0rd # Пароль пользователя для виртуальной машины
+        vm_shell: "/usr/bin/hostnamectl" # Полный путь до команды
+        vm_shell_args: "set-hostname ISP-22" # Аргументы команды
+      delegate_to: localhost
+```
+
+Запускаем скрипт
+
+```
+ansible-playbook changeHostname.yaml 
+```
+
+### Изменение hostname через SSH
+
+Создаем `play-book` с названием `changeHostnameViaSSH.yaml`
+
+```
+---
+
+- name: Init settings
+  hosts: VMs
+  tags:
+    - skip_ansible_lint
+  tasks:
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+```
+
+### Назначаем IP на интерфейсы
+
+```
+---
+
+    - name: Create folder for interfaces
+      ansible.builtin.file:
+        path: "/etc/net/ifaces/{{ item['ifname'] }}"
+        state: directory
+        mode: '0777'
+      loop: "{{ vars.vars.interfaces }}"
+    - name: Creating a file with IP address
+      ansible.builtin.copy:
+        dest: "/etc/net/ifaces/{{ item['ifname'] }}/ipv4address"
+        content: "{{ item['ifaddr']+item['mask'] }}"
+        mode: '0777'
+      loop: "{{ vars.vars.interfaces }}"
+    - name: Create file options fot interfaces
+      ansible.builtin.copy:
+        dest: "/etc/net/ifaces/{{ item['ifname'] }}/options"
+        content: "TYPE=eth
+        DISABLE=no
+        NM_CONTROLLED=no
+        BOOTPROTO=static
+        CONFIG_IPV4=yes"
+        mode: '0777'
+      loop: "{{ vars.vars.interfaces }}"
+    - name: Enable routing
+      shell:
+        cmd: "sed -i -e 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/net/sysctl.conf"
+    - name: Setting default gateway on Servers
+      when: item['gw'] is defined
+      ansible.builtin.copy:
+        dest: "/etc/net/ifaces/{{ item['ifname'] }}/ipv4route"
+        content: "default via {{ item['gw'] }}"
+        mode: '0777'
+      loop: "{{ vars.vars.interfaces }}"
+    - name: Restart network
+      ansible.builtin.systemd:
+        name: network
+        state: restarted
+
+```
+
+### Создание модулей проекта
+
+Сейчас все наш сценарий хранится в одном файле. Со временем в файл вы будите добавлять новые задачи. Что затруднит ориентацию в этотм сценарии. Поэтому разделим весь сценарий на части
+
+Для этого в корневой папке вашего проекта создадим папку `tasks`
+
+В этой папке создадим следующие файлы:
+
+```
+setHostname.yaml
+enableRouting.yaml
+setIpAddress.yaml
+setDefaultGateway.yaml
+restartNetwork.yaml
+```
+
+Теперь наполним созданные файлы следующим содержимом
+
+`setHostname.yaml`
+
+```
+---
+
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+```
+
+`enableRouting.yaml`
+
+```
+---
+
+- name: Enable routing
+  shell:
+    cmd: "sed -i -e 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/net/sysctl.conf"
+
+```
+
+`setIpAddress.yaml`
+
+```
+---
+
+- name: Creating a folder for interfaces
+  ansible.builtin.file:
+    path: "/etc/net/ifaces/{{ item['ifname'] }}"
+    state: directory
+    mode: '0777'
+  loop: "{{ vars.vars.interfaces }}"
+- name: Creating a file with IP address
+  ansible.builtin.copy:
+    dest: "/etc/net/ifaces/{{ item['ifname'] }}/ipv4address"
+    content: "{{ item['ifaddr']+item['mask'] }}"
+    mode: '0777'
+  loop: "{{ vars.vars.interfaces }}"
+- name: Creating a file options for interfaces
+  ansible.builtin.copy:
+    dest: "/etc/net/ifaces/{{ item['ifname'] }}/options"
+    content: "TYPE=eth
+    DISABLE=no
+    NM_CONTROLLED=no
+    BOOTPROTO=static
+    CONFIG_IPV4=yes"
+    mode: '0777'
+  loop: "{{ vars.vars.interfaces }}"
+```
+
+`setDefaultGateway.yaml`
+
+```
+---
+
+- name: Setting default gateway on Servers
+  when: item['gw'] is defined
+  ansible.builtin.copy:
+    dest: "/etc/net/ifaces/{{ item['ifname'] }}/ipv4route"
+    content: "default via {{ item['gw'] }}"
+    mode: '0777'
+  loop: "{{ vars.vars.interfaces }}"
+```
+
+`restartNetwork.yaml`
+
+```
+---
+
+- name: Restart network
+  ansible.builtin.systemd:
+    name: network
+    state: restarted
+```
+
+## Теперь объединим все эти задачи в один `playbook`
+
+в папке `/playbook` создадим файл `initSettings.yaml`
+
+```
+---
+
+- name: Init settings
+  hosts: VMs
+  tasks:
+    - include_tasks: tasks/setHostname.yaml
+    - include_tasks: tasks/enableRouting.yaml
+    - include_tasks: tasks/setIpAddress.yaml
+    - include_tasks: tasks/setDefaultGateway.yaml
+    - include_tasks: tasks/restartNetwork.yaml
+```
+
+тем самым мы сделали такой же сценарий, но теперь проще его воспринимать и масштабировать
+
+### Создание туннельных интерфейсов.
+
+Перед написанием сценария нужно добавить тунельные интерфейсы в инвентарный файл.
+
+Но в дальнешем мы сталкнемся с проблемой как программой поймет что это туннельный интерфейс ведь настройка обычного интерфейса и туннельного отличается.
+
+Поэтому предварительно у `каждого` интерфейса в инвентарном файле укажем его тип:
+
+```
+{ ifname: 'ens192', type: 'eth', ifaddr: '2.2.2.2', mask: '/30', gw: '2.2.2.1'}
+```
+
+После этого добавим на `HQ-R` и `BR-R` информацию о туннельных интерфейсах. Будте внимательный с названием интерфеса к которому привязываем туннель.
+
+```
+HQ-R:
+    ansible_ssh_host: 10.15.15.3
+    vars:
+    interfaces: [
+        { ifname: 'ens192', type: 'eth', ifaddr: '192.168.0.1', mask: '/25'},
+        { ifname: 'ens224', type: 'eth', ifaddr: '1.1.1.2', mask: '/30', gw: '1.1.1.1'},
+        { ifname: 'tun1', type: 'iptun', ifaddr: '172.16.0.1', mask: '/30', tunlocal: '1.1.1.2', tunremote: '2.2.2.2', interface: 'ens224'}
+    ]
+BR-R:
+    ansible_ssh_host: 10.15.15.4
+    vars:
+    interfaces: [
+        { ifname: 'ens192', type: 'eth', ifaddr: '2.2.2.2', mask: '/30', gw: '2.2.2.1'},
+        { ifname: 'ens224', type: 'eth', ifaddr: '192.168.0.129', mask: '/27'},
+        { ifname: 'tun1', type: 'iptun', ifaddr: '172.16.0.2', mask: '/30', tunlocal: '2.2.2.2', tunremote: '1.1.1.2', interface: 'ens192'}
+    ]
+```
+
+## Написание сценария
+
+Внесем изменения в файл `setIpAddress.yaml` таким образом чтобы задача по созданию файла `options` выполнялась по условию
+
+```
+- name: Creating a file options for  ether interfaces
+  when: item['type'] == 'eth' # Выполнится только для интерфейсов с типом eth
+  ansible.builtin.copy:
+    dest: "/etc/net/ifaces/{{ item['ifname'] }}/options"
+    content: "TYPE=eth
+    DISABLE=no
+    NM_CONTROLLED=no
+    BOOTPROTO=static
+    CONFIG_IPV4=yes"
+    mode: '0777'
+  loop: "{{ vars.vars.interfaces }}"
+- name: Creating a file options for tunnel interfaces
+  when: item['type'] == 'iptun' # Выполнится для интерфесов с типом iptun
+  ansible.builtin.copy:
+    dest: "/etc/net/ifaces/{{ item['ifname'] }}/options"
+    content: "TYPE=iptun
+      TUNTYPE=gre
+      TUNLOCAL={{ item['tunlocal'] }}
+      TUNREMOTE={{ item['tunremote'] }}
+      TUNOPTIONS='ttl 64'
+      HOST={{ item['interface'] }}"
+    mode: '0777'
+  loop: "{{ vars.vars.interfaces }}"
+```
