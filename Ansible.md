@@ -278,7 +278,7 @@ ssh root@10.15.15.2
 Запускаем скрипт
 
 ```
-ansible-playbook /ansible/playbook/changeHostname.yaml 
+ansible-playbook /home/ansible/playbook/changeHostname.yaml 
 ```
 
 ### Изменение hostname через SSH
