@@ -387,7 +387,231 @@ SW1(config-if)# switchport port-security enable
 SW1(config-if)# switchport port-security violation restrict
 ```
 
+## Списки доступа ACL.
+Настроим список доступа для фильтрации по подсетям:
 
+```
+R1(config)# ip aceess-list extended white
+R1(config-acl)# rule 1
+R1(config-acl-rule)# action permit
+R1(config-acl-rule)# match protocol any
+R1(config-acl-rule)# match source-address 192.168.20.0 255.255.255.0
+R1(config-acl-rule)# match destination-address any
+R1(config-acl-rule)# enable
+```
+
+Применим список доступа на интерфейс gi1/0/1 и сохраним конфигурацию:
+
+```
+R1(config)# interface gi1/0/1
+R1(config)# service-acl input white
+```
+
+Просмотреть детальную информацию о списке доступа возможно через команду:
+
+```
+R1(config)# do show ip access-list white
+```
+
+## Удаленный мониторинг SNMP.
+Настройка SNMPv3
+Включаем SNMP-сервер:
+
+```
+R1(config)# snmp-server
+```
+
+оздаем пользователя SNMPv3:
+
+```
+R1(config)# snmp-server user admin
+```
+
+Определим режим безопасности:
+
+```
+R1(snmp-user)# authentication access priv
+```
+
+Определим алгоритм аутентификации для SNMPv3-запросов:
+
+```
+R1(snmp-user)# authentication algorithm md5
+```
+
+Установим пароль для аутентификации SNMPv3-запросов:
+
+```
+R1(snmp-user)# authentication key ascii-text P@ssw0rd
+```
+
+Определим алгоритм шифрования передаваемых данных:
+
+```
+R1(snmp-user)# privacy algorithm aes128
+```
+
+Установим пароль для шифрования передаваемых данных:
+
+```
+R1(snmp-user)# privacy key ascii-text P@ssw0rd
+```
+
+Активируем SNMPv3-пользователя:
+
+```
+R1(snmp-user)# enable
+R1(snmp-user)# exit
+```
+
+Определяем сервер-приемник Trap-PDU сообщений:
+
+```
+R1(config)# snmp-server host 172.16.1.10
+```
+
+Добавляем данный маршрутизатор в список любой программы для мониторинга локальной сети, и получаем результат:
+
+![image](https://github.com/Danul1545/demo2024/assets/148867600/2736ba13-3c30-4b9c-a3bd-ec2cdc23c7c7)
+
+## Настройка GRE- и IPSec-туннелей.
+Настройка GRE-туннеля
+Создадим туннель GRE 1 на R1:
+
+```
+R1(config)# tunnel gre 1
+```
+
+Укажем локальный и удаленный шлюз (IP-адреса интерфейсов, граничащих с WAN):
+ 
+```
+R1(config-gre)# local address 1.1.1.2
+R1(config-gre)# remote address 2.2.2.2
+```
+
+Укажем IP-адрес туннеля 172.16.1.1/30:
+
+```
+R1(config-gre)# ip add 172.16.1.1/30
+```
+
+Включим туннель и выйдем:
+
+```
+R1(config-gre)# enable
+```
+
+На маршрутизаторе должен быть создан маршрут до локальной сети партнера. В качестве интерфейса назначения указываем ранее созданный туннель GRE:
+
+```
+R1(config)# ip route 172.16.1.0/30 tunnel gre 1
+```
+
+Сделаем то же на маршрутизаторе R2, с некоторыми отличиями:
+
+```
+R2(config)# tunnel gre 1
+R2(config-gre)# local address 2.2.2.2
+R2(config-gre)# remote address 1.1.1.2
+R2(config-gre)# ip add 172.16.1.2/30
+R2(config-gre)# enable
+R2(config-gre)# exit
+R2(config)# ip route 172.16.1.0/30 tunnel gre 1
+```
+
+Состояние туннеля можно посмотреть командой:`R1# show tunnels status gre 1`
+Конфигурацию туннеля можно посмотреть командой: - `R1# show tunnels configuration gre 1`
+
+### Настройка IPsec-туннеля на R1
+Настроим IPsec на туннеле GRE 1. Создадим профиль протокола IKE. В профиле укажем группу Диффи-Хэллмана 2, алгоритм шифрования AES 128 bit, алгоритм аутентификации MD5. Данные параметры безопасности используются для защиты IKE-соединения:
+
+```
+R1(config)# security ike proposal ike_prop
+R1(config-ike-proposal)# authentication algorithm md5
+R1(config-ike-proposal)# encryption algorithm aes128
+R1(config-ike-proposal)# dh-group 2
+```
+
+Создадим политику протокола IKE. В политике указывается список профилей протокола IKE, по которым могут согласовываться узлы и ключ аутентификации:
+
+```
+R1(config)# security ike policy ike_pol1
+R1(config-ike-policy)# pre-shared-key ascii-text P@ssw0rd
+R1(config-ike-policy)# proposal ike_prop1
+```
+
+Создадим шлюз протокола IKE. В данном профиле указывается GRE-туннель, политика, версия протокола и режим перенаправления трафика в туннель:
+
+```
+R1(config)# security ike gateway ike_gw1
+R1(config-ike-gw)# ike-policy ike_pol1
+R1(config-ike-gw)# local address 1.1.1.2
+R1(config-ike-gw)# local network 1.1.1.2/32 protocol gre
+R1(config-ike-gw)# remote address 2.2.2.2
+R1(config-ike-gw)# remote network 2.2.2.2/32 protocol gre
+R1(config-ike-gw)# mode policy_based
+```
+
+Создадим профиль параметров безопасности для IPsec-туннеля. В профиле укажем группу Диффи-Хэллмана 2, алгоритм шифрования AES 128 bit, алгоритм аутентификации MD5. Данные параметры безопасности используются для защиты IPsec-туннеля:
+
+```
+R1(config)# security ipsec proposal ipsec_prop1
+R1(config-ipsec-proposal)# authentication algorithm md5
+R1(config-ipsec-proposal)# encryption algorithm aes128
+R1(config-ipsec-proposal)# pfs dh-group 2
+```
+
+Создадим политику для IPsec-туннеля. В политике указывается список профилей IPsec-туннеля, по которым могут согласовываться узлы:
+
+```
+R1(config)# security ipsec policy ipsec_pol1
+R1(config-ipsec-policy)# proposal ipsec_prop1
+```
+
+Создадим IPsec VPN. В VPN указывается шлюз IKE-протокола, политика IP sec-туннеля, режим обмена ключами и способ установления соединения. После ввода всех параметров включим туннель командой enable и сохраним конфигурацию:
+
+```
+R1(config)# security ipsec vpn ipsec1
+R1(config-ipsec-vpn)# ike establish-tunnel route
+R1(config-ipsec-vpn)# ike gateway ike_gw1
+R1(config-ipsec-vpn)# ike ipsec-policy ipsec_pol1
+R1(config-ipsec-vpn)# enable
+```
+
+Делаем то же для R2, но с небольшими отличиями:
+
+```
+R2(config)# security ike proposal ike_prop
+R2(config-ike-proposal)# authentication algorithm md5
+R2(config-ike-proposal)# encryption algorithm aes128
+R2(config-ike-proposal)# dh-group 2
+R2(config-ike-proposal)# exit
+R2(config)# security ike policy ike_pol1
+R2(config-ike-policy)# pre-shared-key ascii-text P@ssw0rd
+R2(config-ike-policy)# proposal ike_prop1
+R2(config-ike-policy)# exit
+R2(config)# security ike gateway ike_gw1
+R2(config-ike-gw)# ike-policy ike_pol1
+R2(config-ike-gw)# local address 2.2.2.2
+R2(config-ike-gw)# local network 2.2.2.2/32 protocol gre
+R2(config-ike-gw)# remote address 1.1.1.2
+R2(config-ike-gw)# remote network 1.1.1.2/32 protocol gre
+R2(config-ike-gw)# mode policy_based
+R2(config-ike-gw)# exit
+R2(config)# security ipsec proposal ipsec_prop1
+R2(config-ipsec-proposal)# authentication algorithm md5
+R2(config-ipsec-proposal)# encryption algorithm aes128
+R2(config-ipsec-proposal)# pfs dh-group 2
+R2(config-ipsec-proposal)# exit
+R2(config)# security ipsec policy ipsec_pol1
+R2(config-ipsec-policy)# proposal ipsec_prop1
+R2(config-ipsec-policy)# exit
+R2(config)# security ipsec vpn ipsec1
+R2(config-ipsec-vpn)# ike establish-tunnel route
+R2(config-ipsec-vpn)# ike gateway ike_gw1
+R2(config-ipsec-vpn)# ike ipsec-policy ipsec_pol1
+R2(config-ipsec-vpn)# enable
+```
 
 
 
