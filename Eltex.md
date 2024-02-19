@@ -125,9 +125,156 @@ R1(config-dhcp-server)# exit
 R1(config)# ip dhcp-server (включает службу DHCP)
 ```
 
+## Настройка Source NAT
 
+Настроим доступ пользователей локальной сети 192.168.0.0/24 к публичной сети с использованием функции Source NAT, через IP-адрес внешней сети 10.0.0.2. Настройку начнем с создания зон TRUST и UNTRUST, который обозначают LAN и WAN сегмент соответственно:
 
+```
+R1(config)# security zone UNTRUST
+R1(config-zone)# exit
+R1(config)# security zone TRUST
+R1(config-zone)# exit
+```
 
+На интерфейсах укажем зоны:
+
+```
+R1(config)# int gi1/0/2
+R1(config-if-gi)# security-zone TRUST
+R1(config-if-gi)# exit
+R1(config)# int gi1/0/1
+R1(config-if-gi)# security-zone UNTRUST
+```
+
+Для конфигурирования SNAT и настройки правил зон безопасности потребуется создать профиль адресов локальной сети «LOCAL_NET», включающий адреса, которым разрешен выход в публичную сеть, и профиль адреса публичной сети «WAN_NET»:
+
+```
+R1(config)# object-group network LOCAL_NET
+R1(config-object-group-network)# ip address-range 192.168.0.1-192.168.0.254
+R1(config-object-group-network)# exit
+R1(config)# object-group network WAN_NET
+R1(config-object-group-network)# ip address-range 10.0.0.2
+```
+
+Для пропуска трафика из зоны «TRUST» в зону «UNTRUST» создадим пару зон и добавим правила, разрешающие проходить трафику в этом направлении. Дополнительно включена проверка адреса источника данных на принадлежность к диапазону адресов «LOCAL_NET» для соблюдения ограничения на выход в публичную сеть. Действие правил разрешается командой enable:
+
+```
+R1(config)# security zone-pair TRUST UNTRUST
+R1(config-zone-pair)# rule 1
+R1(config-zone-pair-rule)# match source-address LOCAL_NET
+R1(config-zone-pair-rule)# action permit
+R1(config-zone-pair-rule)# enable
+R1(config-zone-pair-rule)# exit
+R1(config-zone-pair)# exit
+```
+
+Конфигурируем сервис SNAT. Первым шагом создаётся IP-адрес публичной сети (WAN), используемых для сервиса SNAT:
+
+```
+R1(config)# nat sourсe
+R1(config-snat)# pool WAN_ADDRESS
+R1(config-snat-pool)# ip address-range 10.0.0.2
+R1(config-snat-pool)# exit
+```
+
+Создаём набор правил SNAT. В атрибутах набора укажем, что правила применяются только для пакетов, направляющихся в публичную сеть – в зону «UNTRUST». Правила включают проверку адреса источника данных на принадлежность к пулу «LOCAL_NET»:
+
+```
+R1(config-snat)# ruleset SNAT
+R1(config-snat-ruleset)# to zone UNTRUST
+R1(config-snat-ruleset)# rule 1
+R1(config-snat-rule)# match source-address LOCAL_NET
+R1(config-snat-rule)# action source-nat pool WAN_ADDRESS
+R1(config-snat-rule)# enable
+```
+
+Для того, чтобы маршрутизатор R1 синхронизировал время с провайдером ISP, нужно настроить NTP:
+
+```
+R1(config)# ntp enable
+R1(config)# ntp server 10.0.0.1
+```
+
+## Настройка MultiWAN на маршрутизаторе организации.
+
+Настройка MultiWAN на R1. Настроим маршрутизацию:
+
+```
+R1(config)# ip route 8.8.8.8/32 wan load-balance rule 1
+```
+
+Создадим список для проверки целостности соединения:
+
+```
+R1(config)# wan load-balance target-list google
+R1(config-target-list)# target 1
+```
+
+Зададим адрес для проверки, включим проверку указанного адреса и выйдем:
+
+```
+R1(config-wan-target)# ip address 8.8.8.8
+R1(config-wan-target)# enable
+```
+
+Настроим интерфейсы. В режиме конфигурирования интерфейса gi1/0/1 указываем nexthop:
+
+```
+R1(config)# interface gi1/0/1
+R1(config-if)# wan load-balance nexthop 1.1.1.1
+```
+
+В режиме конфигурирования интерфейса gi1/0/1 указываем список целей для проверки соединения:
+
+```
+R1(config-if)# wan load-balance target-list google
+```
+
+В режиме конфигурирования интерфейса gi1/0/1 включаем WAN-режим и выходим:
+
+```
+R1(config-if)# wan load-balance enable
+```
+
+В режиме конфигурирования интерфейса gi1/0/2 указываем nexthop:
+
+```
+R1(config)# interface gi1/0/2
+R1(config-if)# wan load-balance nexthop 2.2.2.1
+R1(config-if)# wan load-balance target-list google
+```
+
+В режиме конфигурирования интерфейса gi1/0/2 включаем WAN-режим и выходим:
+
+```
+R1(config-if)# wan load-balance enable
+``` 
+
+Создадим правило WAN:
+
+```
+R1(config)# wan load-balance rule 1
+```
+
+Укажем участвующие интерфейсы:
+
+```
+R1(config-wan-rule)# outbound interface gi1/0/1
+R1(config-wan-rule)# outbound interface gi1/0/2
+```
+
+Включим созданное правило балансировки и выйдем из режима конфигурирования правила:
+
+```
+R1(config-wan-rule)# enable
+```
+
+Функция MultiWAN также может работать в режиме резервирования, в котором трафик будет направляться в активный интерфейс c наибольшим весом. Включить данный режим можно следующими командами:
+
+```
+R1(config)# wan load-balance rule 1
+R1(config-wan-rule)# failover
+```
 
 
 
