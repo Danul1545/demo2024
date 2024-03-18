@@ -516,3 +516,87 @@ BR-R:
     mode: '0777'
   loop: "{{ vars.vars.interfaces }}"
 ```
+
+
+## Настройка пользователей.
+#### Файл `Admin_CLI.yaml`
+```
+- name: create users 
+  hosts: CLI
+  tasks: 
+    - name: addmin
+      shell: adduser admin
+
+    - name: root priv
+      shell: usermod -aG root admin
+
+    - name: passi
+      shell: passwd admin
+      shell: echo "P@ssw0rd" | passwd --stdin admin   
+```
+#### Файл `Admin_HQ.yaml`
+```
+---
+
+- name: Create local users
+  hosts: HQ-SRV, HQ-R
+  tasks: 
+    - name: addmin
+      shell: useradd admin
+
+    - name: root priv
+      shell: usermod -aG root admin
+
+    - name: Pass
+      shell: passwd admin
+      shell: echo "P@ssw0rd" | passwd --stdin admin   
+```
+#### Файл `Branchadmin.yaml`
+```
+---
+
+- name: Create local users
+  hosts: BR-R, BR-SRV
+  tasks: 
+    - name: addmin
+      shell: useradd branchadmin
+
+    - name: root priv
+      shell: usermod -aG root branchadmin
+
+    - name: Pass
+      shell: passwd branchadmin
+      shell: echo "P@ssw0rd" | passwd --stdin abranchadmin
+```
+#### Файл `Networkadmin.yaml`
+```
+---
+
+- name: Create local users
+  hosts: BR-R, BR-SRV, HQ-R
+  tasks: 
+    - name: addmin
+      shell: useradd networkadmin
+
+    - name: root priv
+      shell: usermod -aG root networkadmin
+
+    - name: Pass
+      shell: passwd networkadmin
+      shell: echo "P@ssw0rd" | passwd --stdin networkadmin
+```
+
+#### Объеденение фалов.
+
+```
+---
+
+- name: Settings
+  hosts: VMs
+  tasks:
+    - include_tasks: Addusers/Admin_HQ.yaml
+    - include_tasks: Addusers/Branchadmin.yaml
+    - include_tasks: Addusers/Networkadmin.yaml
+    - include_tasks: Addusers/Admin_CLI
+    
+```
