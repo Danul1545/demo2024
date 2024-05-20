@@ -469,32 +469,36 @@ AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 stude
 apt-get install docker-engine -y
 ```
 
-или для старых репозиториях
-```
-
 Запускаем Docker:
 ```
 systemctl enable --now docker
 ```
+
 Скачиваем контейнер Hello-World:
 ```
 docker pull hello-world
 ```
+
 Смотрим список контейнеров:
 ```
 docker images
 ```
+
 Запускаем контейнер Hello-World:
 ```
 docker run hello-world
 ```
+
 Останавливаем контейнер:
 ```
 docker rm -v *ID контейнера* 
 ```
+
 Удаляем контейнер:
 ```
 docker rm -f *имя* или *ID контейнера*
+```
+
 
 
 
