@@ -494,18 +494,7 @@ docker rm -v *ID контейнера*
 ```
 Удаляем контейнер:
 ```
-docker rmi *ID контейнера*
-```
+docker rm -f *имя* или *ID контейнера*
 
-
-
-
-
-
-
-
-
-apt-get install docker-ce -y
-```
 
 
