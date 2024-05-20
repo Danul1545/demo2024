@@ -470,7 +470,41 @@ apt-get install docker-engine -y
 ```
 
 или для старых репозиториях
-``` 
+```
+
+Запускаем Docker:
+```
+systemctl enable --now docker
+```
+Скачиваем контейнер Hello-World:
+```
+docker pull hello-world
+```
+Смотрим список контейнеров:
+```
+docker images
+```
+Запускаем контейнер Hello-World:
+```
+docker run hello-world
+```
+Останавливаем контейнер:
+```
+docker rm -v *ID контейнера* 
+```
+Удаляем контейнер:
+```
+docker rmi *ID контейнера*
+```
+
+
+
+
+
+
+
+
+
 apt-get install docker-ce -y
 ```
 
