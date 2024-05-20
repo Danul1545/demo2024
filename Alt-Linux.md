@@ -1366,115 +1366,16 @@ nano /etc/openssh/sshd_config
 AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 student@10.10.201.174
 ```
 
-# Модуль 2 задание 2
+# Создание и настройка Docker.
 
-Настройте синхронизацию времени между сетевыми устройствами по протоколу NTP.  
-a. В качестве сервера должен выступать роутер HQ-R со стратумом 5  
-b. Используйте Loopback интерфейс на HQ-R, как источник сервера времени  
-c. Все остальные устройства и сервера должны синхронизировать свое время с роутером HQ-R  
-d. Все устройства и сервера настроены на московский часовой пояс (UTC +3)  
+скачиваем докер
+``` 
+apt-get install docker-engine -y
+```
 
-Переставить часовой пояс на всех машинах:
+или для старых репозиториях
+``` 
+apt-get install docker-ce -y
 ```
-timedatectl set-timezone Asia/Yekaterinburg
-```
-Установить `chrony` на всех устройствах:
-```
-apt-get install -y chrony
-```
-Автозагрузка:
-```
-systemctl enable --now chronyd
-```
-Конфигурация `HQ-R`:
-```
-nano /etc/chrony.conf
-```
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/7cc4f29b-f180-40d9-bdde-fe031658417c)
-
-Конфигурация на клиентах (в зависимости от сети):
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/d0115300-bf60-47ed-ad7d-3f3beabd438f)
-
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/06ea5432-dcef-43d8-b20e-a14afb36c0d3)
-
-Просмотр клиентов:
-```
-chronyc clients
-```
-# Модуль 2 задание 1
-
-Настройте DNS-сервер на сервере HQ-SRV: 
-a. На DNS сервере необходимо настроить 2 зоны  
-Зона hq.work, также не забудьте настроить обратную зону.
-
-|Имя|Тип записи|Адрес|
-|:-:|:-:|:-:|
-|hq-r.hq.work|A, PTR|IP-адрес|
-|hq-srv.hq.work|A, PTR|IP-адрес|
-|br-r.branch.work|A, PTR|IP-адрес|
-|br-srv.branch.work|A|IP-адрес|
-
-https://sysahelper.gitbook.io/sysahelper/main/linux_admin/main/altdnsserversetup  
-Установка:
-```
-apt-get update && apt-get install bind -y
-```
-```
-nano /var/lib/bind/etc/options.conf
-```
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/96dc68eb-413b-4438-89e4-f377ae9dc9bd)
-
-```
-systemctl enable --now bind
-```
-```
-nano /etc/resolv.conf
-```
-```
-search hq.work
-search branch.work
-nameserver 127.0.0.1
-```
-```
-nano /var/lib/bind/etc/local.conf
-```
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/42494756-a69b-4d00-adb6-2b80b4ac5cc7)
-
-```
-cp /var/lib/bind/etc/zone/{localdomain,hq.db}
-```
-```
-chown named. /var/lib/bind/etc/zone/champ.db
-chmod 600 /var/lib/bind/etc/zone/champ.db
-```
-```
-nano /var/lib/bind/etc/zone/hq.db
-```
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/6f3af999-1b05-47b1-a522-9fb760c0eabe)
-
-```
-nano /var/lib/bind/etc/zone/branch.db
-```
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/5d60448f-0bc0-4e64-b8a9-615173d88fa0)
-
-```
-nano /var/lib/bind/etc/zone/0.db
-```
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/9e079573-5137-41cc-a6d9-65b57e1acbd2)
-
-Проверка:
-```
-named-checkconf -z
-```
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/4d99eca1-66d6-46f6-a156-d43dd1f0f1ca)
 
 
-```
-systemctl restart bind
-```
-```
-nslookup hq-r.hq.work
-```
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/ab4b1341-ec1c-46cf-ae02-a261528c8f53)
-
-![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/c0f0a401-2bbf-430a-8b4c-ea683fd20048)
