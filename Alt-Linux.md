@@ -518,7 +518,7 @@ docker pull nginx
 
 вписать эту команду
 ```
-docker run --rm -d --anme nginx -v /data/app:/var/www/html -p 0.0.0.0:80:80 nginx
+docker run --rm -d --name nginx -v /data/app:/var/www/html -p 0.0.0.0:80:80 nginx
 ```
 
 и проверить работу
