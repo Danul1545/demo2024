@@ -511,13 +511,20 @@ apt-get install nginx -y
 ```
 systemctl enabled --now nginx
 ```
+зваустить его в docker
+```
+docker pull nginx
+```
 
 вписать эту команду
 ```
-
+docker run --rm -d --anme nginx -v /data/app:/var/www/html -p 0.0.0.0:80:80 nginx
 ```
 
-
+и проверить работу
+```
+docker ps
+```
 
 
 
