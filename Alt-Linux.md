@@ -499,6 +499,33 @@ docker rm -v *ID контейнера*
 docker image rm -f *имя* или *ID контейнера*
 ```
 
+Для добовления docker с  нужно:
+
+скачать сам nginx
+```
+apt-get update
+apt-get install nginx -y
+```
+
+запустить его
+```
+systemctl enabled --now nginx
+```
+
+вписать эту команду
+```
+
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
