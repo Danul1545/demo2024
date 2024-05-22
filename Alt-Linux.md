@@ -528,11 +528,13 @@ docker ps
 
 
 сетка должна выглядить так
+
 ![image](https://github.com/Danul1545/demo2024/assets/148867600/ccab2d57-f9aa-434e-80d1-048e8187e822)
 
 
 
 вписываем в строку браузера ip выходдящий в интернет, если работает то должно выйти такое окно
+
 ![image](https://github.com/Danul1545/demo2024/assets/148867600/f5726f6e-d0f1-485c-99c3-fed742e16aeb)
 
 
