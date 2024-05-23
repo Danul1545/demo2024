@@ -503,42 +503,67 @@ docker image rm -f *имя* или *ID контейнера*
 
 Для добовления docker с nginx нужно:
 
-скачать сам nginx
+Скачать сам nginx
 ```
 apt-get update
 apt-get install nginx -y
 ```
 
-запустить его
+Запустить его
 ```
 systemctl enabled --now nginx
 ```
-зваустить его в docker
+Зваустить его в docker
 ```
 docker pull nginx
 ```
 
-вписать эту команду
+Вписать эту команду
 ```
 docker run --rm -d --name nginx -v /data/app:/var/www/html -p 0.0.0.0:80:80 nginx
 ```
 
-и проверить работу
+И проверить работу
 ```
 docker ps
 ```
 
 
-сетка должна выглядить так
+Сетка должна выглядить так
 
 ![image](https://github.com/Danul1545/demo2024/assets/148867600/ccab2d57-f9aa-434e-80d1-048e8187e822)
 
 
 
-вписываем в строку браузера ip выходдящий в интернет, если работает то должно выйти такое окно
+Вписываем в строку браузера ip выходдящий в интернет, если работает то должно выйти такое окно
 
 ![image](https://github.com/Danul1545/demo2024/assets/148867600/f5726f6e-d0f1-485c-99c3-fed742e16aeb)
 
+## Задание 3
+
+Для того чтобы изметить имя на сервере nginx нужно:
+
+Запустьть интерактивную оболочку в контейнере Docker
+```
+docker exec -it nginx /bin/bash
+```
+
+Скачать редактор файлов `nano` или `vim`
+```
+apt-get update
+apt-get install -y nano
+```
+
+Открываем файл 
+```
+nano /usr/share/nginx/html/index.html
+```
+
+В файле меняем строчку `<h1>Hi Nginx</h1>` вписывая `<h1>своё имя</h1>`
+
+Сохраняем файл и проверям по его ip.
+
+## Задание 4
 
 
 
