@@ -619,13 +619,17 @@ def read_item(item_id: int, q: Union[str, None] = None):
 ```
 Далее в директории `/fastapi` создаём файл Dockerfile и заполняем его
 ```
->nano /fastapi/Dockerfile
-
+#
 FROM python:3.9
-WORKDIR /code 
-COPY ./requirements.txt /code/requirements.txt# 
+#
+WORKDIR /code
+#
+COPY ./requirements.txt /code/requirements.txt#
+#
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt 
+#
 COPY ./app /code/app 
+#
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
 ```
 Не выходя из директории `/fastapi`, создаём в ней образ приложения FastAPI
