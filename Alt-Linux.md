@@ -1,6 +1,9 @@
 # ALT - LINUX    
 
-## Задание 1.1  
+
+<details>
+<summary>Базова настройка всех устройств</summary>
+
 __Цель задания:__  
 Выполнить базовую настройку всех устройств:  
     a.Собрать топологию согласно рисунку. Все устройства работают на OC Linux - ALT  
@@ -173,7 +176,11 @@ systemctl restart network
 
 ![image](https://github.com/Danul1545/demo2024/assets/148867600/cf6fddea-e2d4-45c9-8f5c-1be4ebf6c637)
 
-## NAT с помощью firewalld ISP,HQ-R,BR-R:
+</details>
+    
+<details>
+    <summary>NAT с помощью firewalld ISP,HQ-R,BR-R</summary>
+    
 Отключить NetworkManager:
 ```
 systemctl disable network.service NetworkManager
@@ -207,7 +214,9 @@ firewall-cmd --permanent --zone=public --add-masquerade
 ```
 firewall-cmd --reload
 ```
-# NAT 2 способ ISP,HQ-R,BR-R:
+    <details>
+    
+NAT 2 способ ISP,HQ-R,BR-R:
 Правило:
 ```
 iptables -A POSTROUTING -t nat -j MASQUERADE
@@ -231,8 +240,10 @@ chmod +x /etc/net/scripts/nat
 ```
 service iptables enable
 ```
+</details>
 
-# Модуль 1 задание 2
+
+<details><summary>Маршрутизация через frr</summary>
 
 Настройте внутреннюю динамическую маршрутизацию по средствам FRR. Выберите и обоснуйте выбор протокола динамической маршрутизации из расчёта, что в дальнейшем сеть будет масштабироваться.  
 a. Составьте топологию сети L3.  
@@ -264,10 +275,10 @@ vtysh
 sh in br
 ```
 |Interface|Status|VRF|Adresses|
-|:----:|:-:|:------:|:-------------:|
-|ens224|up |default|192.168.0.162/30|
-|ens192|up |default|192.168.0.129/27|
-|lo    |up |default|                |
+|:----:|:-:|:------:|:--------------:|
+|ens224|up |default |192.168.0.162/30|
+|ens192|up |default |192.168.0.129/27|
+|lo    |up |default |                |
 
 Активировать ospf:
 ```
@@ -288,8 +299,9 @@ do w
 ```
 
 ![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/a39631c1-a683-47d2-a63a-4bbb93d7556a)
+</details>
 
-# Модуль 1 задание 3
+<details><summary>Раздача ip-адресов через dhcp</summary>
 
 Настройте автоматическое распределение IP-адресов на роутере HQ-R.  
 a. Учтите, что у сервера должен быть зарезервирован адрес.
@@ -355,7 +367,10 @@ service network restart
 ens18:
     inet 192.168.0.38/25 brd 192.168.0.127
 ```
-# Модуль 1 задание 4
+</details>
+
+<details><summary>Добавление пользователей на виртуальные машины</summary>
+
 Настройте локальные учётные записи на всех устройствах в соответствии с таблицей.
 
 |Учётная запись|Пароль|Примечание|
@@ -382,7 +397,10 @@ nano /etc/passwd
 ```
 admin:x:0:501::/home/admin:/bin/bash
 ```
-# Модуль 1 задание 5
+</details>
+
+<details><summary>Измерьте пропускную способность сети между двумя узлами</summary>
+
 
 Измерьте пропускную способность сети между двумя узлами HQ-R-ISP по средствам утилиты iperf 3. Предоставьте описание пропускной способности канала со скриншотами.
 
@@ -407,7 +425,9 @@ iperf3 -c 192.168.0.161 -f M
 [ 5] 1.00-2.00 sec 338 MBytes 338 MBytes/sec    0 676 KBytes
 [ 5] 3.00-4.00 sec 341 MBytes 341 MBytes/sec    0 749 KBytes
 ```
-# Модуль 1 задание 6
+</details>
+
+<details><summary>backup скрипты для сохранения конфигурации сетевых устройств</summary>
 
 Составьте backup скрипты для сохранения конфигурации сетевых устройств, а именно HQ-R BR-R. Продемонстрируйте их работу.
 
@@ -425,8 +445,9 @@ ls /etc/networkbackup
 ```
 frr.conf
 ```
+</details>
 
-# Модуль 1 задание 7
+<details><summary>подключение по SSH для удалённого конфигурирования устройства</summary>
 
 Настройте подключение по SSH для удалённого конфигурирования устройства HQ-SRV по порту 2222. Учтите, что вам необходимо перенаправить трафик на этот порт по средствам контролирования трафика.
 
@@ -449,7 +470,11 @@ PasswordAuthentication yes
 ```
 ssh student@192.168.0.40 -p 2222
 ```
-# Модуль 1 задание 8
+
+</details>
+
+<details><summary>контроль доступа до HQ-SRV по SSH</summary>
+
 
 Настройте контроль доступа до HQ-SRV по SSH со всех устройств, кроме CLI.
 
@@ -461,7 +486,7 @@ nano /etc/openssh/sshd_config
 ```
 AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 student@10.10.201.174
 ```
-
+</details>
 
 
 
