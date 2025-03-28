@@ -1,5 +1,6 @@
 # ALT - LINUX    
 
+## Модуль 1 задание 1
 
 <details>
 <summary>Базова настройка всех устройств</summary>
@@ -177,9 +178,50 @@ systemctl restart network
 ![image](https://github.com/Danul1545/demo2024/assets/148867600/cf6fddea-e2d4-45c9-8f5c-1be4ebf6c637)
 
 </details>
-    
+
+## Модуль 1 задание 2
+
 <details>
-    <summary>NAT с помощью firewalld ISP,HQ-R,BR-R</summary>
+    <summary>NAT с помощью iptables</summary>
+
+Включить ip-адресацию `/etc/sysctl.conf`
+```
+net.ipv4.ip_forward = 1
+```
+
+Приминить изменения
+```
+sudo sysctl -p
+```
+
+Интерфейсы:
+- `eth0` - внешний интерфейс
+- `eth1` - внутрений интерфейс
+
+Интерфейс с раздачей интернета:
+```
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+```
+
+Разрешения на передачу адресации:
+внутри
+```
+iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+```
+снаружи
+```
+iptables -A FORWARD -i eth0 -o eth1 -m state --state ESTABLISHED,RELATED -j ACCEPT
+```
+
+Сохранить настройку:
+```
+iptables-save
+```
+
+</details>
+
+<details>
+    <summary>NAT с помощью firewalld</summary>
     
 Отключить NetworkManager:
 ```
@@ -214,34 +256,10 @@ firewall-cmd --permanent --zone=public --add-masquerade
 ```
 firewall-cmd --reload
 ```
-    <details>
-    
-NAT 2 способ ISP,HQ-R,BR-R:
-Правило:
-```
-iptables -A POSTROUTING -t nat -j MASQUERADE
-```
-Применение правил, работает только до перезагрузки:
-```
-iptables-save
-```
-Сохранение правил:
-```
-nano /etc/net/scripts/nat
-```
-```
-#!/bin/sh
-/sbin/iptables -A POSTROUTING -t nat -j MASQUERADE
-```
-```
-chmod +x /etc/net/scripts/nat
-```
-Автозагрузка:
-```
-service iptables enable
-```
+
 </details>
 
+## Модуль 1 задание 3
 
 <details><summary>Маршрутизация через frr</summary>
 
@@ -300,6 +318,8 @@ do w
 
 ![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/a39631c1-a683-47d2-a63a-4bbb93d7556a)
 </details>
+
+## Модуль 1 задание 4
 
 <details><summary>Раздача ip-адресов через dhcp</summary>
 
@@ -369,6 +389,8 @@ ens18:
 ```
 </details>
 
+## Модуль 1 задание 5
+
 <details><summary>Добавление пользователей на виртуальные машины</summary>
 
 Настройте локальные учётные записи на всех устройствах в соответствии с таблицей.
@@ -399,6 +421,8 @@ admin:x:0:501::/home/admin:/bin/bash
 ```
 </details>
 
+## Модуль 1 задание 6
+
 <details><summary>Измерьте пропускную способность сети между двумя узлами</summary>
 
 
@@ -408,10 +432,10 @@ admin:x:0:501::/home/admin:/bin/bash
 apt-get -y install iperf3
 ```
 ISP как сервер:
-> если надо открыть порт
->```
->iptables -A INPUT -p tcp --dport 5201 -j ACCEPT
->```
+если надо открыть порт
+```
+iptables -A INPUT -p tcp --dport 5201 -j ACCEPT
+```
 ```
 iperf3 -s
 ```
@@ -426,6 +450,8 @@ iperf3 -c 192.168.0.161 -f M
 [ 5] 3.00-4.00 sec 341 MBytes 341 MBytes/sec    0 749 KBytes
 ```
 </details>
+
+## Модуль 1 задание 7
 
 <details><summary>backup скрипты для сохранения конфигурации сетевых устройств</summary>
 
@@ -446,6 +472,8 @@ ls /etc/networkbackup
 frr.conf
 ```
 </details>
+
+## Модуль 1 задание 8
 
 <details><summary>подключение по SSH для удалённого конфигурирования устройства</summary>
 
@@ -472,6 +500,8 @@ ssh student@192.168.0.40 -p 2222
 ```
 
 </details>
+
+## Модуль 1 задание 9
 
 <details><summary>контроль доступа до HQ-SRV по SSH</summary>
 
