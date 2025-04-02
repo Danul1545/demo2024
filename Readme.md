@@ -135,7 +135,10 @@ systemctl disable network.service NetworkManager
 
 ### Всё тоже самое повторил на других интерфейсах
 
-## Настройка тунеля между HQ-R и BR-R.
+</details>
+
+<details>
+<summary>Настройка тунеля на роутерах</summary> 
 
 Создаём новый интерфейс.
 ```
