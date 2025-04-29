@@ -187,7 +187,7 @@ systemctl restart network
 <details>
     <summary>NAT с помощью iptables</summary>
 
-Включить ip-адресацию `/etc/sysctl.conf`
+Включить ip-адресацию `/etc/net/sysctl.conf`
 ```
 net.ipv4.ip_forward = 1
 ```
