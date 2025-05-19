@@ -521,6 +521,82 @@ AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 stude
 ```
 </details>
 
+## Модуль 2
+
+<details><summary>Запустите сервис MediaWiki используя docker на сервере HQ-SRV</summary>
+
+Установка Docker и Docker-compose:
+
+```
+apt-get update && apt-get install -y docker-engine
+apt-get install -y docker-compose
+```
+
+Автозагрузка Docker:
+
+```
+systemctl enable --now docker
+```
+Загружаем образы следующей командой:
+
+```
+docker pull mediawiki
+docker pull mariadb
+```
+
+Создаем в домашней директории пользователя файл, в качестве пользователя, которого мы создавали при установке ОС, у нас – user, а его домашний каталог – /home/user, файл называется – wiki.yml, для приложения MediaWiki:
+
+```
+mcedit /home/user/wiki.yml
+```
+
+И заполняем его следующими строками
+```
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123qweR%
+      MYSQL_DATABASE: mediawiki
+      MYSQL_USER: wiki
+      MYSQL_PASSWORD: WikiP@ssw0rd
+    volumes: [ mariadb_data:/var/lib/mysql ]
+  wiki:
+    image: mediawiki
+    container_name: wiki
+    restart: always
+    environment:
+      MEDIAWIKI_DB_HOST: mariadb
+      MEDIAWIKI_DB_USER: wiki
+      MEDIAWIKI_DB_PASSWORD: WikiP@ssw0rd
+      MEDIAWIKI_DB_NAME: mediawiki
+    ports:
+      - "8080:80"
+  #volumes: [ /home/user/mediawiki/LocalSettings.php:/var/www/html/LocalSettings.php ]
+volumes:
+  mariadb_data:
+```
+![image](https://github.com/user-attachments/assets/42f34c05-326b-4efc-9c7a-43476d81d9a7)
+
+После всех настроек строку volumes.. мы обратно раскомментируем, убрав символ #!
+
+Обычная версия:
+```
+docker-compose -f /home/user/wiki.yml up -d
+```
+
+<details><summaryВторая версия:<summary>
+```
+docker compose -f /home/user/wiki.yml up -d
+```
+</details>
+
+
+</details>
+
+
 
 
 
