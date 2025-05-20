@@ -558,7 +558,7 @@ services:
     container_name: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 123qweR%
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
       MYSQL_DATABASE: mediawiki
       MYSQL_USER: wiki
       MYSQL_PASSWORD: WikiP@ssw0rd
@@ -587,11 +587,24 @@ volumes:
 docker-compose -f /home/user/wiki.yml up -d
 ```
 
-<details><summaryВторая версия:<summary>
-```
-docker compose -f /home/user/wiki.yml up -d
-```
-</details>
+Вторая версия `docker compose -f /home/user/wiki.yml up -d`
+
+Заходим с клиента HQ-CLI на сайт после запуска контейнера:
+![image](https://github.com/user-attachments/assets/b563650a-e7c6-468a-82be-1cb082ebbba9)
+
+Видим, что файл LocalSettings.php не найден, и нажимаем на complete the installation или set up the wiki.
+
+Выбираем удобный язык и нажиаем далее.
+Заполняем строки состояния:
+- Хост базы данных: `mariadb`
+- Имя базы данных (без дефисов): `mediawiki`
+- Имя пользователя базы данных: `wiki`
+- Пароль базы данных: `WikiP@ssw0rd`    
+
+
+
+
+
 
 
 </details>
