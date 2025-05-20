@@ -623,11 +623,121 @@ docker compose -f wiki.yml up -d
 ![image](https://github.com/user-attachments/assets/4f00042a-eb35-4457-85ef-d00111a71d25)
 
 
-
 </details>
 
 
+<details>
+    <summary>Запустите сервис moodle на сервере HQ-SRV</summary>
+
+Устанавливаем для ряд пакетов, которые будут нам нужны для работы:
+```
+apt-get update
+
+apt-get install apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-opcache php8.2-curl php8.2-gd php8.2-intl php8.2-mysqli php8.2-xml php8.2-xmlrpc php8.2-ldap php8.2-zip php8.2-soap php8.2-mbstring php8.2-json php8.2-xmlreader php8.2-fileinfo php8.2-sodium
+```
+
+Включаем службы httpd2 и mysqld для дальнейшей работы с ними следующей командой:
+
+```
+systemctl enable –now httpd2 mysqld
+```
+
+Теперь настроим безопасный доступ к нашей будущей базе данных с помощью команды: `mysql_secure_installation`
+Прожимаем просто enter, т.к. сейчас root без пароля: `Enter`
+Прожимаем y для задания пароля: `Y` 
+Задаем пароль к нашему root, желательно стандартный: `123qweR%`
+Далее нажимаем на всё y, как на скриншоте `Y`
+
+![image](https://github.com/user-attachments/assets/b640b051-00ab-442d-8ea2-9ee6bf4cc4f7)
+
+Теперь заходим в СУБД для создания и настройки базы данных:
+mariadb -u root -p
+CREATE DATABASE moodledb;
+CREATE USER moodle IDENTIFIED BY ‘P@ssw0rd’;
+GRANT ALL PRIVILEGES ON moodledb.* TO moodle;
+FLUSH PRIVILEGES;
+![image](https://github.com/user-attachments/assets/0d058122-9020-49a3-a895-101060238d54)
+
+
+Теперь скачаем сам мудл стабильной версии:
+```
+curl -L https://github.com/moodle/moodle/archive/refs/tags/v4.5.0.zip > /root/moodle.zip
+```
+
+![image](https://github.com/user-attachments/assets/2e7f0c19-cc57-4bb4-a85e-75d9d8bd26e3)
+
+Разархивируем его в /var/www/html/ для дальнейшей настройки:
+```
+unzip /root/moodle.zip -d /var/www/html
+mv /var/www/html/moodle-4.5.0/* /var/www/html/
+ls /var/www/html
+```
+
+Создадим новый каталог moodledata, там будут храниться данные и изменим владельца на каталогах html и moodledata:
+```
+mkdir /var/www/moodledata
+chown apache2:apache2 /var/www/html
+chown apache2:apache2 /var/www/moodledata
+```
+
+Поменяем значение параметра max_input_vars в файле php.ini:
+```
+mcedit /etc/php/8.2/apache2-mod_php/php.ini
+```
+Жмём F7 для поиска нужной нам строки и пишем туда:
+```
+max_input_vars
+```
+![image](https://github.com/user-attachments/assets/c35e3e86-e661-48fc-b8bb-348b2571e61d)
+
+Раскомментируем и пишем новое значение: `max_input_vars = 5000`
+
+Удаляем стандартную страницу apache:
+```
+cd /var/www/html
+ls
+rm index.html
+```
+Перезапускаем службу httpd2:
+```
+systemctl restart httpd2
+```
+Теперь подключаемся с клиента HQ-CLI и начинаем настройку:
+```
+http://192.168.1.2/install.php
+```
+![image](https://github.com/user-attachments/assets/a775d4e9-cb07-4021-bf9a-33cd531bcb79)
+
+Выбираем MariaDB в качестве драйвера базы данных:
+![image](https://github.com/user-attachments/assets/1198a998-79b3-4879-afaf-8598b10b9e72)
+
+Введём нужные данные в следующие строки:
+Название базы данных: `moodledb`
+Пользователь базы данных: `moodle`
+Пароль: `P@ssw0rd`
+![image](https://github.com/user-attachments/assets/e8d42f2e-5c9c-4d6a-a034-009fc8556992)
+
+Далее заполняем обязательные поля для создания основного администратора:
+Логин: `admin`
+Новый пароль: `P@ssw0rd`
+Имя: `Администратор` (или другое)
+Фамилия: `Пользователь` (или другое)
+Адрес электронной почты: `test.test@mail.ru` (или другое)
+И нажимаем `Обновить профиль`
+![image](https://github.com/user-attachments/assets/802a4878-5b4a-4fde-8c19-ab3d0bd3b66c)
+
+Теперь заполним ещё некоторые строки на следующем шаге:
+Полное название сайта: `11` (согласно рабочему месту)
+Краткое название сайта: `moodle` (или другое)
+Настройки местоположения: `Азия/Барнаул` (согласно региону)
+Контакты службы поддержки: `test.test@mail.ru` (или другое)
+И жмём `Сохранить изменения` в конце страницы:
+![image](https://github.com/user-attachments/assets/d8075191-8449-4105-a929-60d1ecd4397d)
+
+И после всего нас встречает рабочий сайт moodle, смотрим, что все наши указанные параметры отображаются:
+![image](https://github.com/user-attachments/assets/ee034847-324c-41df-b3bc-9a7857c9a5ed)
 
 
 
 
+</details>
