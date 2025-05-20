@@ -601,9 +601,26 @@ docker-compose -f /home/user/wiki.yml up -d
 - Имя пользователя базы данных: `wiki`
 - Пароль базы данных: `WikiP@ssw0rd`    
 
+Далее автоматически скачивается файл LocalSettings.php, который нужно переместить теперь на сервер с mediawiki, а именно на BR-SRV c HQ-CLI:
+scp -P 2024 /home/user/Загрузки/LocalSettings.php sshuser@192.168.4.2:/home/sshuser/
+![image](https://github.com/user-attachments/assets/ad61519c-4531-4a4f-9fc0-a73fa413212a)
+
+Теперь заходим на сервер BR-SRV и перемещаем скачанный файл в /root, но перед этим удаляем то, что создалось в /root:
+rm -rf /home/user/LocalSettings.php
+mkdir /home/user/mediawiki
+mv /home/sshuser/LocalSettings.php /home/user/mediawiki/
+ls /home/user/mediawiki/
 
 
+убираем # со строки volume.
 
+Теперь перезапускаем контейнеры путём запуска контейнера ещё раз:
+```
+docker compose -f wiki.yml up -d
+```
+
+Проверим работу сайта, зайдем вновь через клиента HQ-CLI и увидим домашнюю страницу сайта:
+![image](https://github.com/user-attachments/assets/4f00042a-eb35-4457-85ef-d00111a71d25)
 
 
 
