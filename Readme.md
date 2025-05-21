@@ -1,4 +1,4 @@
-# ALT - LINUX    
+# <p align="center">ALT - LINUX</p>
 
 # Модуль 1
 
