@@ -2,7 +2,7 @@
 
 # Модуль 1
 
-### модуль 1 задание 1
+### <p align="center">модуль 1 задание 1</p>
 
 <details>
 <summary>Базова настройка всех устройств</summary>
@@ -184,7 +184,7 @@ systemctl restart network
 
 </details>
 
-### модуль 1 задание 2
+### <p align="center">модуль 1 задание 2</p>
 
 <details>
     <summary>NAT с помощью iptables</summary>
@@ -264,7 +264,7 @@ firewall-cmd --reload
 
 </details>
 
-### модуль 1 задание 3
+### <p align="center">модуль 1 задание 3</p>
 
 <details><summary>Маршрутизация через frr</summary>
 
@@ -324,7 +324,7 @@ do w
 ![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/a39631c1-a683-47d2-a63a-4bbb93d7556a)
 </details>
 
-### модуль 1 задание 4
+### <p align="center">модуль 1 задание 4</p>
 
 <details><summary>Раздача ip-адресов через dhcp</summary>
 
@@ -394,7 +394,7 @@ ens18:
 ```
 </details>
 
-### модуль 1 задание 5
+### <p align="center">модуль 1 задание 5</p>
 
 <details><summary>Добавление пользователей на виртуальные машины</summary>
 
@@ -426,7 +426,7 @@ admin:x:0:501::/home/admin:/bin/bash
 ```
 </details>
 
-### модуль 1 задание 6
+### <p align="center">модуль 1 задание 6</p>
 
 <details><summary>Измерьте пропускную способность сети между двумя узлами</summary>
 
@@ -456,7 +456,7 @@ iperf3 -c 192.168.0.161 -f M
 ```
 </details>
 
-### модуль 1 задание 7
+### <p align="center">модуль 1 задание 7</p>
 
 <details><summary>backup скрипты для сохранения конфигурации сетевых устройств</summary>
 
@@ -478,7 +478,7 @@ frr.conf
 ```
 </details>
 
-### модуль 1 задание 8
+### <p align="center">модуль 1 задание 8</p>
 
 <details><summary>подключение по SSH для удалённого конфигурирования устройства</summary>
 
@@ -506,7 +506,7 @@ ssh student@192.168.0.40 -p 2222
 
 </details>
 
-### модуль 1 задание 9
+### <p align="center">модуль 1 задание 9</p>
 
 <details><summary>контроль доступа до HQ-SRV по SSH</summary>
 
@@ -526,7 +526,7 @@ AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 stude
 # Модуль 2
 
 
-### модуль 2 задание 1
+### <p align="center">модуль 2 задание 1</p>
 
 <details><summary>Настройка доменного контроллера Samba на машине BR-SRV</summary>
 
@@ -804,7 +804,7 @@ bash /root/import
 
 </details>
 
-### модуль 2 задание 5
+### <p align="center">модуль 2 задание 5</p>
 
 <details><summary>Запустите сервис MediaWiki используя docker на сервере HQ-SRV</summary>
 
@@ -907,7 +907,7 @@ docker compose -f wiki.yml up -d
 
 </details>
 
-### модуль 2 задание 6
+### <p align="center">модуль 2 задание 6</p>
 
 <details><summary>статическая трансляция портов</summary>
 
@@ -942,7 +942,7 @@ ssh -p 2024 sshuser@192.168.4.1
 
 </details>
 
-### модуль 2 задание 7
+### <p align="center">модуль 2 задание 7</p>
 
 <details><summary>Запустите сервис moodle на сервере HQ-SRV</summary>
 
@@ -1062,7 +1062,7 @@ http://192.168.1.2/install.php
 
 </details>
 
-### модуль 2 задание 8
+### <p align="center">модуль 2 задание 8</p>
 
 <details><summary>веб-сервер nginx как обратный прокси-сервер на HQ-RTR</summary>
 
@@ -1126,7 +1126,7 @@ systemctl restart nginx
 
 </details>
 
-### модуль 2 задание 9
+### <p align="center">модуль 2 задание 9</p>
 
 <details><summary>установить Яндекс Браузере на HQ-CLI</summary>
 
