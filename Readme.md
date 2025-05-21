@@ -135,7 +135,7 @@ ip a
 systemctl disable network.service NetworkManager
 ```
 
-### Всё тоже самое повторил на других интерфейсах
+Всё тоже самое повторил на других интерфейсах
 
 </details>
 
