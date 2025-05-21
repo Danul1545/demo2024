@@ -643,19 +643,20 @@ systemctl enable –now httpd2 mysqld
 ```
 
 Теперь настроим безопасный доступ к нашей будущей базе данных с помощью команды: `mysql_secure_installation`
-Прожимаем просто enter, т.к. сейчас root без пароля: `Enter`
-Прожимаем y для задания пароля: `Y` 
-Задаем пароль к нашему root, желательно стандартный: `123qweR%`
-Далее нажимаем на всё y, как на скриншоте `Y`
+- Прожимаем просто enter, т.к. сейчас root без пароля: `Enter`
+- Прожимаем y для задания пароля: `Y` 
+- Задаем пароль к нашему root, желательно стандартный: `123qweR%`
+- Далее нажимаем на всё y, как на скриншоте `Y`
 
 ![image](https://github.com/user-attachments/assets/b640b051-00ab-442d-8ea2-9ee6bf4cc4f7)
 
 Теперь заходим в СУБД для создания и настройки базы данных:
-mariadb -u root -p
-CREATE DATABASE moodledb;
-CREATE USER moodle IDENTIFIED BY ‘P@ssw0rd’;
-GRANT ALL PRIVILEGES ON moodledb.* TO moodle;
-FLUSH PRIVILEGES;
+- mariadb -u root -p
+- CREATE DATABASE moodledb;
+- CREATE USER moodle IDENTIFIED BY ‘P@ssw0rd’;
+- GRANT ALL PRIVILEGES ON moodledb.* TO moodle;
+- FLUSH PRIVILEGES;
+
 ![image](https://github.com/user-attachments/assets/0d058122-9020-49a3-a895-101060238d54)
 
 
@@ -688,6 +689,7 @@ mcedit /etc/php/8.2/apache2-mod_php/php.ini
 ```
 max_input_vars
 ```
+
 ![image](https://github.com/user-attachments/assets/c35e3e86-e661-48fc-b8bb-348b2571e61d)
 
 Раскомментируем и пишем новое значение: `max_input_vars = 5000`
@@ -711,30 +713,34 @@ http://192.168.1.2/install.php
 Выбираем MariaDB в качестве драйвера базы данных:
 ![image](https://github.com/user-attachments/assets/1198a998-79b3-4879-afaf-8598b10b9e72)
 
-Введём нужные данные в следующие строки:
-Название базы данных: `moodledb`
-Пользователь базы данных: `moodle`
-Пароль: `P@ssw0rd`
+- Введём нужные данные в следующие строки:
+- Название базы данных: `moodledb`
+- Пользователь базы данных: `moodle`
+- Пароль: `P@ssw0rd`
+
 ![image](https://github.com/user-attachments/assets/e8d42f2e-5c9c-4d6a-a034-009fc8556992)
 
 Далее заполняем обязательные поля для создания основного администратора:
-Логин: `admin`
-Новый пароль: `P@ssw0rd`
-Имя: `Администратор` (или другое)
-Фамилия: `Пользователь` (или другое)
-Адрес электронной почты: `test.test@mail.ru` (или другое)
-И нажимаем `Обновить профиль`
+- Логин: `admin`
+- Новый пароль: `P@ssw0rd`
+- Имя: `Администратор` (или другое)
+- Фамилия: `Пользователь` (или другое)
+- Адрес электронной почты: `test.test@mail.ru` (или другое)
+- И нажимаем `Обновить профиль`
+
 ![image](https://github.com/user-attachments/assets/802a4878-5b4a-4fde-8c19-ab3d0bd3b66c)
 
 Теперь заполним ещё некоторые строки на следующем шаге:
-Полное название сайта: `11` (согласно рабочему месту)
-Краткое название сайта: `moodle` (или другое)
-Настройки местоположения: `Азия/Барнаул` (согласно региону)
-Контакты службы поддержки: `test.test@mail.ru` (или другое)
-И жмём `Сохранить изменения` в конце страницы:
+- Полное название сайта: `11` (согласно рабочему месту)
+- Краткое название сайта: `moodle` (или другое)
+- Настройки местоположения: `Азия/Барнаул` (согласно региону)
+- Контакты службы поддержки: `test.test@mail.ru` (или другое)
+- И жмём `Сохранить изменения` в конце страницы:
+
 ![image](https://github.com/user-attachments/assets/d8075191-8449-4105-a929-60d1ecd4397d)
 
 И после всего нас встречает рабочий сайт moodle, смотрим, что все наши указанные параметры отображаются:
+
 ![image](https://github.com/user-attachments/assets/ee034847-324c-41df-b3bc-9a7857c9a5ed)
 
 
