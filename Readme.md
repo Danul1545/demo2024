@@ -523,6 +523,283 @@ AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 stude
 
 ## Модуль 2
 
+<details><summary>Настройка доменного контроллера Samba на машине BR-SRV</summary>
+
+Перед настройкой самого контроллера домена удалим службу bind с нашего сервера:
+```
+apt-get remove bind
+```
+
+Переходим к настройке BR-SRV:
+Проверьте, что /etc/resolv.conf хранит запись `nameserver 127.0.0.1` и применяем её:
+```
+resolvconf -u
+```
+
+Теперь ставим долгожданную службу samba на BR-SRV:
+```
+apt-get update
+apt-get install task-samba-dc admc -y
+```
+
+Проверяем, что установлено полное доменное имя у BR-SRV: `hostname -f`
+
+![image](https://github.com/user-attachments/assets/27b50faf-9c5c-4234-8186-89c58916625d)
+
+
+Если запись не соответствует рисунку выше, то нужно его настроить:
+```
+hostnamectl set-hostname br-srv.au-team.irpo; exec bash
+```
+
+Настроим hosts, добавив новую запись в конец файла: `mcedit /etc/hosts` (Ставим свой Ip)
+
+![image](https://github.com/user-attachments/assets/bdffc8c5-0d6f-4a41-8baf-edccff048313)
+
+Теперь в конфигурацию нашего DNS-сервера на HQ-SRV добавим следующую строку: `server=/au-team.irpo/192.168.4.2`
+
+
+![image](https://github.com/user-attachments/assets/f614d707-d84a-4fc0-b11f-e8ee9877b86c)
+
+Перезапускаем dnsmasq как службу:
+```
+systemctl restart dnsmasq
+```
+
+А теперь запускаем автонастройку доменного контроллера на BR-SRV. Если предложенные значения верны, те, что находятся в [], то нажимаем Enter, если нет, то нужно проверять предыдущие настройки.
+- samba-tool domain provision
+- AU-TEAM.IRPO
+- AU-TEAM
+- dc
+- SAMBA_INTERNAL
+- 192.168.1.2 (Здесь вводим Ip вручную)
+- P@ssw0rd
+
+![image](https://github.com/user-attachments/assets/2a083e6d-a486-4e45-9f51-b60316769ea6)
+
+После настройки должно появится такое в терминале, это значит, что всё настроено верно:
+
+![image](https://github.com/user-attachments/assets/5ca2d482-87c0-4893-9f14-b6c0315dacb2)
+
+Перемещаем сгенерированный конфиг krb5.conf и включаем службу samba:
+```
+mv -f /var/lib/samba/private/krb5.conf /etc/krb5.conf
+systemctl enable samba
+```
+
+Из-за того, что на Alt Linux могут пропадать IP-адреса после перезагрузки системы, добавим запись о перезапуске службы network и samba в crontab (именно в таком порядке), пишем в консоль:
+```
+export EDITOR=mcedit
+сrontab -e
+```
+
+И вносим в конец файла следующие строки:
+```
+@reboot /bin/systemctl restart network
+@reboot /bin/systemctl restart samba
+```
+
+![image](https://github.com/user-attachments/assets/92a32f4c-6758-4a7e-b7dd-a62f3fc5440c)
+
+Теперь ПЕРЕЗАПУСКАЕМ машину BR-SRV: `reboot`
+
+Проверяем работу домена:
+```
+samba-tool domain info 127.0.0.1
+```
+
+![image](https://github.com/user-attachments/assets/eff03722-21e1-4d9a-a2cc-545578f834f7)
+
+Домен работает, у вас должно всё соответствовать картинке выше.
+Теперь создадим 5 пользователей:
+```
+samba-tool user add user1.hq P@ssw0rd
+samba-tool user add user2.hq P@ssw0rd
+samba-tool user add user3.hq P@ssw0rd
+samba-tool user add user4.hq P@ssw0rd
+samba-tool user add user5.hq P@ssw0rd
+```
+
+Теперь создадим группу и поместим туда созданных пользователей:
+```
+samba-tool group add hq
+samba-tool group addmembers hq user1.hq,user2.hq,user3.hq,user4.hq,user5.hq
+```
+
+Теперь введём HQ-CLI `Центр управления системой -> Айтентийфикация` заполняем по скриншоту:
+
+![image](https://github.com/user-attachments/assets/b9ece031-d083-4ac4-b75c-50fa16d30e9f)
+
+Вводим пароль, который вводили при настройке домена через `samba-tool`.
+
+После ввода в домен должно появиться следующее сообщение на экране: 
+
+![image](https://github.com/user-attachments/assets/ca4cb9a5-990a-4595-a356-ef1f94e15ae0)
+
+Перезагружаем машину HQ-CLI.
+
+Чтобы настроить права созданных нами пользователей, нужно установить ещё один пакет на BR-SRV, но перед этим нужно подключить нужный репозиторий следующей командой:
+```
+apt-repo add rpm http://altrepo.ru/local-p10 noarch local-p10
+```
+
+Теперь обновляем список пакетов и можем устанавливать нужный нам пакет:
+```
+apt-get update
+apt-get install sudo-samba-schema
+```
+
+Далее добавляем новую схему следующей командой:
+```
+sudo-schema-apply
+```
+
+В открывшимся окне, нажимаем yes: 
+
+![image](https://github.com/user-attachments/assets/9f13e018-cb6a-4ae1-b5f4-11b1944ccb11)
+
+Затем прописываем пароль от доменного администратора.
+После этого должно появиться такое окно:
+
+![image](https://github.com/user-attachments/assets/64c0cbba-d4ac-4714-a3f1-4432c709d460)
+
+Далее мы создаём новое правило следующей командой (которую он сам предлагает в этом окне): `create-sudo-rule`
+И вносим следующие изменения (имя правила можно любое):
+- Имя правила      : `prava_hq`
+- sudoCommand      : `/bin/cat`
+- sudoUser         : `%hq`
+
+При успешном добавлении выведет следующие строки:
+
+![image](https://github.com/user-attachments/assets/1a6fef2c-1dc1-47f7-ba71-f320a2cfaae6)
+
+На HQ-CLI ставим пакет:
+```
+apt-get install admc
+```
+
+Затем создаём тикет доменного администратора, чтобы получить права на редактирование правил на сервере:
+```
+kinit administrator
+P@ssw0rd
+```
+
+И запускаем admc:
+
+![image](https://github.com/user-attachments/assets/694282fb-df82-48b3-81a0-2e021f8c6899)
+
+Включим дополнительные возможности через настройки:
+
+![image](https://github.com/user-attachments/assets/29271ece-816b-46b8-a5a6-72ca769970e6)
+
+
+Поменяем опцию `sudoOption` в созданном нами ранее правиле `prava_hq` (правило всегда будет находиться в OU с названием sudoers):
+
+![image](https://github.com/user-attachments/assets/f6d61af1-9b63-4230-b9bf-e4f7c033fbbc)
+
+Новое значение будет: `!authenticate`
+
+И добавим ещё две команды в опцию sudoCommand: `grep и id`
+
+![image](https://github.com/user-attachments/assets/46fb15a1-0963-44b0-bba4-faa6370a1419)
+
+Теперь, чтобы работали все созданные нами правила, нужно зайти на HQ-CLI и установить дополнительные пакеты:
+```
+apt-get update
+apt-get install sudo libsss_sudo
+```
+
+Разрешаем использование sudo:
+```
+control sudo public
+```
+
+Настроим конфиг `sssd.conf`:
+```
+mcedit /etc/sssd/sssd.conf
+services = nss, pam, sudo
+sudo_provider = ad
+```
+
+![image](https://github.com/user-attachments/assets/1875680f-a944-42dd-ae00-f6aabd842f2d)
+
+Теперь отредактируем `nsswitch.conf`:
+
+```
+mcedit /etc/nsswitch.conf
+sudoers: files sss
+```
+
+![image](https://github.com/user-attachments/assets/fac63c5f-28ce-4bd5-9d0c-8fe62809f098)
+
+Теперь перезагрузим нашу клиентскую машину HQ-CLI `reboot`
+
+На данном этапе мы можем проверить настроенные нами права и правильность настроек конфигурационных файлов. Сделать мы это можем под локальной учётной записью, у которого есть права администратора, в нашем случае это просто root. А ещё мы можем открыть вторую сессию нажав сочетание клавиш: `Ctrl+Alt+F2`
+В дальнейшем мы можем переключаться между ними, т.к. нажатием тех же клавиш, но теперь уже с F1 мы вернемся на первую нашу сессию с графической оболочкой: `Ctrl+Alt+F1`
+После того как зашли на вторую сессию, логинимся под `root`.
+
+На всякий случай, нужно очистить кэш и удалить остаточные файлы, чтобы всё перезаписалось и применилось, для этого пишем следующие команды:
+```
+rm -rf /var/lib/sss/db/*
+sss_cache -E
+```
+
+И перезагружаем службу sssd:
+```
+systemctl restart sssd
+```
+
+Теперь проверим, какие правила для sudoers получил наш доменный пользователь:
+```
+sudo -l -U user1.hq
+```
+
+![image](https://github.com/user-attachments/assets/8be98128-378b-45a3-9add-8683c69c3b06)
+
+Вернёмся в первую сессию и залогинимся под нашем доменным пользователем user1.hq и проверить настроенные права наглядно: `Ctrl+Alt+F1`
+```
+sudo cat /etc/passwd | sudo grep root && sudo id root
+```
+
+![image](https://github.com/user-attachments/assets/5a112569-d820-4ab8-88d9-5c6b297b1ea2)
+
+Приступаем к следующему этапу – импортируем пользователей из таблицы `Users.csv`.
+
+Для этого нам нужно скачать файл `Users.csv`, но на ДЭ он уже будет скачан и лежать в каталоге `/opt`. Мы же, для обучения, скачиваем сейчас его сами и перемещаем его в `/opt`. Для этого пишем следующие команды:
+```
+curl -L https://bit.ly/3C1nEYz > /root/users.zip
+unzip /root/users.zip
+mv /root/Users.csv /opt/Users.csv
+```
+
+![image](https://github.com/user-attachments/assets/09a6bcaf-9691-4893-954d-9b92db6a64f2)
+
+Создаём файл import и пишем туда следующий код:
+```
+#!/bin/bash
+csv_file=”/opt/Users.csv”
+while IFS=”;” read -r firstName lastName role phone ou street zip city country password; do
+if [ “$firstName” == “First Name” ]; then
+                continue
+fi
+username=”${firstName,,}.${lastName,,}”
+sudo samba-tool user add “$username” 123qweR%
+done < “$csv_file”
+```
+
+![image](https://github.com/user-attachments/assets/4434e219-28bb-464f-a6b6-abe665e29db5)
+
+Сохраняем этот файл и выдаём ему право на выполнение и запускаем его:
+```
+chmod +x /root/import
+bash /root/import
+```
+
+![image](https://github.com/user-attachments/assets/38b021ad-4df9-4f6b-a07c-159ecc792216)
+
+</details>
+
+
 <details><summary>Запустите сервис MediaWiki используя docker на сервере HQ-SRV</summary>
 
 Установка Docker и Docker-compose:
@@ -626,8 +903,7 @@ docker compose -f wiki.yml up -d
 </details>
 
 
-<details>
-    <summary>Запустите сервис moodle на сервере HQ-SRV</summary>
+<details><summary>Запустите сервис moodle на сервере HQ-SRV</summary>
 
 Устанавливаем для ряд пакетов, которые будут нам нужны для работы:
 ```
@@ -746,8 +1022,7 @@ http://192.168.1.2/install.php
 </details>
 
 
-<details>
-    <summary>веб-сервер nginx как обратный прокси-сервер на HQ-RTR</summary>
+<details><summary>веб-сервер nginx как обратный прокси-сервер на HQ-RTR</summary>
 
 Поменяем значение wwwroot в конфигурации moodle на HQ-SRV: `$CFG->wwwroot        = ‘http://moodle.au-team.irpo’;`
 
@@ -810,4 +1085,16 @@ systemctl restart nginx
 </details>
 
 
+<details><summary>установить Яндекс Браузере на HQ-CLI</summary>
 
+Установим Яндекс Браузер на HQ-CLI через терминал командами:
+```
+apt-get update
+apt-get install yandex-browser-stable
+```
+
+Должен быть по пути: `Пуск → Интернет → Yandex Browser`
+
+![image](https://github.com/user-attachments/assets/67a6f00e-a76b-4370-9a1e-90998362e51e)
+
+</details>
