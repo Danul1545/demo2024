@@ -743,7 +743,32 @@ http://192.168.1.2/install.php
 
 ![image](https://github.com/user-attachments/assets/ee034847-324c-41df-b3bc-9a7857c9a5ed)
 
+</details>
+
+
+<details>
+    <summary>веб-сервер nginx как обратный прокси-сервер на HQ-RTR</summary>
+
+Поменяем значение wwwroot в конфигурации moodle на HQ-SRV: `$CFG->wwwroot        = ‘http://moodle.au-team.irpo’;`
+
+```
+mcedit /var/www/html/config.php
+```
+
+![image](https://github.com/user-attachments/assets/05b68b37-2500-4fe3-95aa-fd6841587213)
+
+Устанавливаем пакет nginx на HQ-RTR для дальнейшей настройки:
+```
+apt install nginx
+```
+
+
+
+
 
 
 
 </details>
+
+
+
