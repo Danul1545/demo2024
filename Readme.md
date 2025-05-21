@@ -1,6 +1,8 @@
 # ALT - LINUX    
 
-## Модуль 1 задание 1
+# Модуль 1
+
+### модуль 1 задание 1
 
 <details>
 <summary>Базова настройка всех устройств</summary>
@@ -182,7 +184,7 @@ systemctl restart network
 
 </details>
 
-## Модуль 1 задание 2
+### модуль 1 задание 2
 
 <details>
     <summary>NAT с помощью iptables</summary>
@@ -262,7 +264,7 @@ firewall-cmd --reload
 
 </details>
 
-## Модуль 1 задание 3
+### модуль 1 задание 3
 
 <details><summary>Маршрутизация через frr</summary>
 
@@ -322,7 +324,7 @@ do w
 ![image](https://github.com/abdurrah1m/DEMO2024/assets/148451230/a39631c1-a683-47d2-a63a-4bbb93d7556a)
 </details>
 
-## Модуль 1 задание 4
+### модуль 1 задание 4
 
 <details><summary>Раздача ip-адресов через dhcp</summary>
 
@@ -392,7 +394,7 @@ ens18:
 ```
 </details>
 
-## Модуль 1 задание 5
+### модуль 1 задание 5
 
 <details><summary>Добавление пользователей на виртуальные машины</summary>
 
@@ -424,7 +426,7 @@ admin:x:0:501::/home/admin:/bin/bash
 ```
 </details>
 
-## Модуль 1 задание 6
+### модуль 1 задание 6
 
 <details><summary>Измерьте пропускную способность сети между двумя узлами</summary>
 
@@ -454,7 +456,7 @@ iperf3 -c 192.168.0.161 -f M
 ```
 </details>
 
-## Модуль 1 задание 7
+### модуль 1 задание 7
 
 <details><summary>backup скрипты для сохранения конфигурации сетевых устройств</summary>
 
@@ -476,7 +478,7 @@ frr.conf
 ```
 </details>
 
-## Модуль 1 задание 8
+### модуль 1 задание 8
 
 <details><summary>подключение по SSH для удалённого конфигурирования устройства</summary>
 
@@ -504,7 +506,7 @@ ssh student@192.168.0.40 -p 2222
 
 </details>
 
-## Модуль 1 задание 9
+### модуль 1 задание 9
 
 <details><summary>контроль доступа до HQ-SRV по SSH</summary>
 
@@ -521,7 +523,10 @@ AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 stude
 ```
 </details>
 
-## Модуль 2
+# Модуль 2
+
+
+### модуль 2 задание 1
 
 <details><summary>Настройка доменного контроллера Samba на машине BR-SRV</summary>
 
@@ -799,6 +804,7 @@ bash /root/import
 
 </details>
 
+### модуль 2 задание 5
 
 <details><summary>Запустите сервис MediaWiki используя docker на сервере HQ-SRV</summary>
 
@@ -899,9 +905,44 @@ docker compose -f wiki.yml up -d
 Проверим работу сайта, зайдем вновь через клиента HQ-CLI и увидим домашнюю страницу сайта:
 ![image](https://github.com/user-attachments/assets/4f00042a-eb35-4457-85ef-d00111a71d25)
 
+</details>
+
+### модуль 2 задание 6
+
+<details><summary>статическая трансляция портов</summary>
+
+Пробросим порт 80 в порт 8080 и порт 2024 в порт 2024 на BR-SRV на маршрутизаторе BR-RTR, для обеспечения работы сервиса mediawiki и ssh, правила прописываем через консоль: (Ip адреса свои)
+```
+iptables -t nat -A PREROUTING -p tcp -d 192.168.4.1 --dport 80 -j DNAT --to-destination 192.168.4.2:8080
+iptables -t nat -A PREROUTING -p tcp -d 192.168.4.1 --dport 2024 -j DNAT --to-destination 192.168.4.2:2024
+```
+
+Сохраняем правила, не забывайте, что у вас уже есть правила, которые мы писали ещё в первом модуле, проверьте, чтобы в этом файле сохранялись и прошлые, и новые (которые мы сейчас ввели):
+```
+iptables-save > /root/rules
+```
+
+Пробросим порт 2024 в порт 2024 на HQ-SRV на маршрутизаторе HQ-RTR, для обеспечения работы сервиса ssh, правило прописываем через консоль:
+```
+iptables -t nat -A PREROUTING -p tcp -d 192.168.1.1 --dport 2024 -j DNAT --to-destination 192.168.1.2:2024
+```
+
+Сохраняем правила:
+```
+iptables-save > /root/rules
+```
+
+Теперь перезагружаем ОБА роутера и проверим правила путём подключения с клиента HQ-CLI по ssh к серверу BR-SRV через IP-адрес роутера BR-RTR:
+```
+ssh -p 2024 sshuser@192.168.4.1
+```
+
+![image](https://github.com/user-attachments/assets/be405383-71bc-4d6e-8c2a-73bfd9cf14e1)
+
 
 </details>
 
+### модуль 2 задание 7
 
 <details><summary>Запустите сервис moodle на сервере HQ-SRV</summary>
 
@@ -1021,6 +1062,7 @@ http://192.168.1.2/install.php
 
 </details>
 
+### модуль 2 задание 8
 
 <details><summary>веб-сервер nginx как обратный прокси-сервер на HQ-RTR</summary>
 
@@ -1084,6 +1126,7 @@ systemctl restart nginx
 
 </details>
 
+### модуль 2 задание 9
 
 <details><summary>установить Яндекс Браузере на HQ-CLI</summary>
 
