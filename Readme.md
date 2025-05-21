@@ -762,10 +762,49 @@ mcedit /var/www/html/config.php
 apt install nginx
 ```
 
+Создаём новый конфигурационный файл proxy:
+```
+mcedit /etc/nginx/sites-available/proxy
+```
 
+И заполняем его следующими строками:
+```
+server {
+listen 80;
+server_name moodle.au-team.irpo;
+location / {
+proxy_pass http://192.168.1.2:80;
+proxy_set_header Host $host;
+                     proxy_set_header X-Real-IP  $remote_addr;
+                     proxy_set_header X-Forwarded-For $remote_addr;
+             }
+}
+server {
+listen 80;
+server_name wiki.au-team.irpo;
+location / {
+proxy_pass http://192.168.4.2:8080;
+proxy_set_header Host $host;
+                     proxy_set_header X-Real-IP  $remote_addr;
+                     proxy_set_header X-Forwarded-For $remote_addr;
+             }
+}
+```
 
+![image](https://github.com/user-attachments/assets/f5fc89b3-768d-4b34-b756-fa03578e10cb)
 
+Удаляем конфигурацию `default`, которую создал nginx, потом включаем созданную нами ранее `proxy`, путём создания символической ссылки,  а затем перезапускаем службу nginx:
+```
+rm -rf /etc/nginx/sites-available/default
+rm -rf /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/proxy /etc/nginx/sites-enabled
+ls -la /etc/nginx/sites-enabled
+systemctl restart nginx
+```
 
+Проверим работу нашего обратного прокси и зайдем на наши поднятые ранее сайты moodle и wiki с клиента HQ-CLI.
+![image](https://github.com/user-attachments/assets/3b69676f-3cb3-40e1-974f-a56c1fa76dac)
+![image](https://github.com/user-attachments/assets/1a24d3cf-0352-4b24-bbe5-cd402feebdc2)
 
 
 </details>
