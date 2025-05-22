@@ -1062,7 +1062,10 @@ chronyc clients
 
 <details><summary>Сконфигурируйте ansible на сервере BR-SRV </summary>
 
-Полная инструкция - ...
+`Зарание скачать Visual Studio Code`
+
+- Полная инструкция [-->](./Ansible.md)
+
 
 
 
