@@ -804,6 +804,37 @@ bash /root/import
 
 </details>
 
+### <p align="center">модуль 2 задание 2</p>
+
+<details><summary>Конфигурация файлового хранилища на HQ-SRV</summary>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</details>
+
+
 ### <p align="center">модуль 2 задание 5</p>
 
 <details><summary>Запустите сервис MediaWiki используя docker на сервере HQ-SRV</summary>
