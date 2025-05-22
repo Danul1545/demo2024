@@ -806,47 +806,6 @@ bash /root/import
 
 ### <p align="center">модуль 2 задание 2</p>
 
-<details><summary>синхронизацию времени между сетевыми устройствами по протоколу NTP</summary>
-
-Переставить часовой пояс на всех машинах:
-```
-timedatectl set-timezone Asia/Yekaterinburg
-```
-
-Установить chrony на всех устройствах:
-```
-apt-get install -y chrony
-```
-
-Автозагрузка:
-```
-systemctl enable --now chronyd
-```
-
-Конфигурация HQ-R:
-```
-nano /etc/chrony.conf
-```
-
-![image](https://github.com/user-attachments/assets/4154867f-c131-40a9-b2a7-4561f94a604a)
-
-Конфигурация на клиентах (в зависимости от сети):
-
-![image](https://github.com/user-attachments/assets/bb3bb647-1962-4ea9-ac9f-59fa697593a4)
-
-![image](https://github.com/user-attachments/assets/c84bb522-c69a-4558-beee-1ad6f8166098)
-
-Просмотр клиентов:
-```
-chronyc clients
-```
-
-![image](https://github.com/user-attachments/assets/de9ef9c8-3c3f-4eb9-bfbc-f3eb6af35c7c)
-
-</details>
-
-### <p align="center">модуль 2 задание 4</p>
-
 <details><summary>Конфигурация файлового хранилища на HQ-SRV</summary>
 
 Качаем утилиту:
@@ -1056,6 +1015,49 @@ chmod 777 /opt/admin/
 ![image](https://github.com/user-attachments/assets/9c40318b-e296-4263-b670-a11ed0e40bc5)
 
 </details>
+
+
+### <p align="center">модуль 2 задание 3</p>
+
+<details><summary>синхронизацию времени между сетевыми устройствами по протоколу NTP</summary>
+
+Переставить часовой пояс на всех машинах:
+```
+timedatectl set-timezone Asia/Yekaterinburg
+```
+
+Установить chrony на всех устройствах:
+```
+apt-get install -y chrony
+```
+
+Автозагрузка:
+```
+systemctl enable --now chronyd
+```
+
+Конфигурация HQ-R:
+```
+nano /etc/chrony.conf
+```
+
+![image](https://github.com/user-attachments/assets/4154867f-c131-40a9-b2a7-4561f94a604a)
+
+Конфигурация на клиентах (в зависимости от сети):
+
+![image](https://github.com/user-attachments/assets/bb3bb647-1962-4ea9-ac9f-59fa697593a4)
+
+![image](https://github.com/user-attachments/assets/c84bb522-c69a-4558-beee-1ad6f8166098)
+
+Просмотр клиентов:
+```
+chronyc clients
+```
+
+![image](https://github.com/user-attachments/assets/de9ef9c8-3c3f-4eb9-bfbc-f3eb6af35c7c)
+
+</details>
+
 
 ### <p align="center">модуль 2 задание 5</p>
 
