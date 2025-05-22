@@ -804,7 +804,7 @@ bash /root/import
 
 </details>
 
-### <p align="center">модуль 2 задание 2</p>
+### <p align="center">модуль 2 задание 4</p>
 
 <details><summary>Конфигурация файлового хранилища на HQ-SRV</summary>
 
