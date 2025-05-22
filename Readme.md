@@ -1058,6 +1058,17 @@ chronyc clients
 
 </details>
 
+### <p align="center">модуль 2 задание 4</p>
+
+<details><summary>Сконфигурируйте ansible на сервере BR-SRV </summary>
+
+Полная инструкция - ...
+
+
+
+
+
+</details>
 
 ### <p align="center">модуль 2 задание 5</p>
 
