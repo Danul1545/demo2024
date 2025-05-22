@@ -23,7 +23,7 @@ __Цель задания:__
 
 Топология сети
 
-![Снимок экрана 2023-12-06 143215](https://github.com/Danul1545/demo2024/assets/148867600/24a47534-3ea4-4205-83db-53da5d0edea6)
+![image](https://github.com/user-attachments/assets/fa09c32a-4473-4533-a0b1-fe1c9cf99640)
 
 Таблица сети (разбитая на подсети)
 
