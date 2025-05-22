@@ -808,14 +808,86 @@ bash /root/import
 
 <details><summary>Конфигурация файлового хранилища на HQ-SRV</summary>
 
+Качаем утилиту:
+```
+apt-get install -y mdadm
+```
+
+Создаём 3 диска по 1 гб и смотрим созданные диски: `lsblk`
+
+![image](https://github.com/user-attachments/assets/f08c11d5-6eea-44f3-afec-d034ebc87bb4)
+
+Стираем данные суперблоков:
+```
+/sbin/mdadm --zero-superblock --force /dev/sd{b,с,d}
+```
+
+Если мы получили такой ответ то значит, что диски не использовались ранее для RAID:
+
+![image](https://github.com/user-attachments/assets/3d578b36-5b02-4f0b-9e1b-f2c315b55cd8)
+
+После удалим старые метаданные и подпись на дисках:
+```
+/sbin/wipefs --all --force /dev/sd{b,c}
+```
+
+Создание RAID:
+```
+/sbin/mdadm --create --verbose /dev/md0 -l 5 -n 3 /dev/sd{b,c,d}
+```
+
+![image](https://github.com/user-attachments/assets/8897224b-3e89-4edb-84cc-73815f4b66e6)
+
+где:
+
+- /dev/md0 — устройство RAID, которое появится после сборки;
+- -l 5 — уровень RAID;
+- -n 3 — количество дисков, из которых собирается массив;
+- /dev/sd{b,c,d} — Диски для установки.
+
+Проверяем: `lsblk`
+
+![image](https://github.com/user-attachments/assets/d3e61522-fb95-4542-8ae9-deb5e215edd0)
+
+Создание файла mdadm.conf:
+```
+mkdir /etc/mdadm
+echo "DEVICE partitions" > /etc/mdadm/mdadm.conf
+/sbin/mdadm --detail --scan --verbose | awk '/ARRAY/ {print}' >> /etc/mdadm/mdadm.conf
+```
+
+Содержимое `mdadm.conf`:
+
+![image](https://github.com/user-attachments/assets/9278689b-93fa-404c-ac1c-b3376a5731ef)
+
+Создание файловой системы для массива:
+```
+/sbin/mkfs.ext4 /dev/md0
+```
+
+Автозагрузка раздела с помощью fstab. Смотрим идентификатор раздела:
+```
+/sbin/blkid | grep /dev/md0
+```
+
+![image](https://github.com/user-attachments/assets/4660f0a6-8105-40b5-81dc-1d01803b3421)
+
+Зписываем этот идентификатор, открываем fstab и добавляем строку:
+```
+nano /etc/fstab
+```
+
+![image](https://github.com/user-attachments/assets/bba354e6-18d5-4121-9a25-a2aa0cfaa731)
 
 
+Выполняем монтирование `mount -a` и проверяем `df -h`
+
+![image](https://github.com/user-attachments/assets/67ee4764-f7b7-44e8-ad44-af015d82a7dd)
+
+</details>
 
 
-
-
-
-
+<details><summary>Настройка NFS-сервера</summary>
 
 
 
@@ -833,7 +905,6 @@ bash /root/import
 
 
 </details>
-
 
 ### <p align="center">модуль 2 задание 5</p>
 
