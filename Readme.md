@@ -90,7 +90,7 @@ ip a
 ```
 systemctl disable network.service NetworkManager
 ```
----
+
 Добовление интерфейсов.  
 ```
 mkdir /etc/net/ifaces/xxx
