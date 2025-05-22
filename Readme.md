@@ -889,20 +889,130 @@ nano /etc/fstab
 
 <details><summary>Настройка NFS-сервера</summary>
 
+Установка пакетов для NFS сервера:
+```
+apt-get install -y nfs-server
+apt-get install -y rpcbind
+apt-get install -y nfs-clients
+apt-get install -y nfs-utils
+```
+
+Автозагрузка:
+```
+systemctl enable --now nfs
+```
+
+Создание директории общего доступа:
+```
+mkdir /mnt/nfs_share
+chmod 777 /mnt/nfs_share
+```
+
+Редактируем `exports`:
+```
+nano /etc/exports
+```
+
+![image](https://github.com/user-attachments/assets/0a9a8734-6883-4f5c-aeb5-a406c064822c)
+
+где:
+
+- /mnt/nfs_share - общий ресурс
+- 192.168.0.0/25 - клиентская сеть, которой разрешено монтирования общего ресурса
+- rw — разрешены чтение и запись
+- no_root_squash — отключение ограничения прав root
+
+Экспорт файловой системы:
+```
+/usr/sbin/exportfs -arv
+```
+
+![image](https://github.com/user-attachments/assets/a6c66b79-3a0f-49ab-a2cc-68910feb6165)
+
+exportfs с флагом -a, означающим экспортировать или отменить экспорт всех каталогов, -r означает повторный экспорт всех каталогов, синхронизируя /var/lib/nfs/etab с /etc/exports и файлами в /etc/exports.d, а флаг -v включает подробный вывод.
+
+Запускаем и добавляем в автозагрузку NFS-сервер:
+```
+systemctl enable --now nfs-server
+```
+
+</details>
 
 
+<details><summary>Настройка NFS-клиента</summary>
 
+Установка пакетов для NFS-клиента:
+```
+apt-get update && apt-get install -y nfs-{utils,clients}
+```
 
+Создадим директорию для монтирования общего ресурса:
+```
+mkdir /opt/share
+chmod 777 /opt/share
+```
 
+Настраиваем автомонтирование общего ресурса через fstab:
+```
+nano /etc/fstab
+```
 
+- где: 192.168.0.40 - адрес файлового сервера
 
+Монтируем: `mount -a` и проверяем `df -h`
 
+![image](https://github.com/user-attachments/assets/d97bba9e-3ee7-412b-b1c1-597d7c4ae7fd)
 
+![image](https://github.com/user-attachments/assets/c8e6fd8f-5fe2-4d4d-a284-d508ef4e49aa)
 
+![image](https://github.com/user-attachments/assets/0dc9b132-587e-43f1-bd40-b2ac758199dd)
 
+</details>
 
+<details><summary>Сервер HQ-SRV</summary>
 
+Создание общих папок на сервере:
+```
+mkdir /mnt/network -p
+mkdir /mnt/admin_files -p
+mkdir /mnt/branch_files -p
+```
 
+Заносим в exports:
+```
+nano /etc/exports
+/mnt/network 192.168.0.0/25 192.168.100.0/27(rw,sync,no_root_squash)
+/mnt/branch_files 192.168.100.0/27(rw,sync,no_root_squash)
+/mnt/admin_files 192.168.0.0/25 4.4.4.0/30(rw,sync,no_root_squash)
+```
+
+Экспортируем:
+```
+/usr/sbin/exportfs -arv
+```
+
+</details>
+
+<details><summary>Клиент HQ-SRV</summary>
+
+Создаём папку:
+```
+mkdir /opt/admin
+```
+
+Задаём права:
+```
+chmod 777 /opt/admin/
+```
+
+Автозагрузка в fstab:
+```
+192.168.0.40:/mnt/admin_files /opt/admin nfs defaults 0 0
+```
+
+Монтаж: `mount -a`
+
+![image](https://github.com/user-attachments/assets/9c40318b-e296-4263-b670-a11ed0e40bc5)
 
 </details>
 
