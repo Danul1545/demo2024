@@ -123,7 +123,7 @@ echo nameserver 8.8.8.8 > /etc/resolv.conf
 ```
 После этого перезагружаем сетевую службу:  
 ```
-service network restart
+systemctl restart network
 ```
 И смотрим результат:  
 ```
@@ -134,7 +134,26 @@ ip a
 systemctl disable network.service NetworkManager
 ```
 
-Всё тоже самое повторил на других интерфейсах
+Для HQ-RTR создаём 2 коталога под интерфейсы c vlan `100` и `200` 
+```
+mkdir /etc/net/ifaces/ens20.100 
+```
+
+После чего создаём и настраиваем файл options:
+```
+BOOTPROTO=static
+HOST=ens20
+TYPE=vlan
+VID=100
+```
+- `для друого интерфейса 200`
+
+
+
+Также перезагружнаеи сетевую службу:  
+```
+systemctl restart network
+```
 
 </details>
 
