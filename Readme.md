@@ -48,12 +48,19 @@ __Цель задания:__
 ```
 ip a
 ```
-После этого приступил к настройке статической маршрутизации  
-Открыл файл options для нужного интерфейса:  
+После этого приступил к настройке статической маршрутизации
+
+Добовление интерфейсов.  
+```
+mkdir /etc/net/ifaces/xxx
+```
+`Вместо x пишется нужный интерфейс`
+
+Файл options для нужного интерфейса:  
 ```
 mcedit /etc/net/ifaces/ens192/options
 ```
-Там поменял все как на примере:   
+Там меняем всё как на примере:   
 ```
 BOOTPROTO=static
 TYPE=eth
@@ -73,47 +80,6 @@ echo xxx.xxx.xxx.xxx/xx > /etc/net/ifaces/ensxxx/ipv4address
 echo default via xxx.xxx.xxx.xxx > /etc/net/ifaces/xxx/ipv4route
 ```
 `Вместо x, нужно вставить IP-адрес и номер интерфейса`  
-Если нужно указать информацию о DNS-сервере, прописываем команду:  
-```
-echo nameserver 8.8.8.8 > /etc/resolv.conf
-```
-После этого перезагружаем сетевую службу:  
-```
-service network restart
-```
-И смотрим результат:  
-```
-ip a
-```
-Если на интерфейсе показывается 2 IP-адреса то  нужно отключить NetworkManager командой:
-```
-systemctl disable network.service NetworkManager
-```
-
-Добовление интерфейсов.  
-```
-mkdir /etc/net/ifaces/xxx
-```
-`Вместо x пишется нужный интерфейс`
-
-Далее в данной папку нужно создать файл `options` со следующими параметрами:
-```
-BOOTPROTO=static
-TYPE=eth
-CONFIG_IPV4=yes
-DISABLED=no
-NM_CONTROLLED=no
-```
-После этого задается нужный адрес на интрефейс:  
-```
-echo xxx.xxx.xxx.xxx/xx > /etc/net/ifaces/ensxxx/ipv4address
-```
-Если нужно добавить шлюз по умолчанию, то нужна эта команда:  
-```
-echo default via xxx.xxx.xxx.xxx > /etc/net/ifaces/xxx/ipv4route
-```
-`Вместо x, нужно вставить IP-адрес и номер интерфейса` 
-
 Если нужно указать информацию о DNS-сервере, прописываем команду:  
 ```
 echo nameserver 8.8.8.8 > /etc/resolv.conf
