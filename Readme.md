@@ -51,19 +51,19 @@ ip a
 После этого приступил к настройке статической маршрутизации  
 Открыл файл options для нужного интерфейса:  
 ```
-vim /etc/net/ifaces/ens192/options
+mcedit /etc/net/ifaces/ens192/options
 ```
 Там поменял все как на примере:   
 ```
 BOOTPROTO=static
 TYPE=eth
-CONFIG_WIRELESS=no
-SYSTEMD_BOOTPROTO=static
 CONFIG_IPV4=yes
 DISABLED=no
 NM_CONTROLLED=no
-SYSTEMD_CONTROLLED=no
 ```
+
+Выходим нажимая `ESC` и сохраняем `yes`
+
 После этого задал нужный адрес на интрефейс:  
 ```
 echo xxx.xxx.xxx.xxx/xx > /etc/net/ifaces/ensxxx/ipv4address
@@ -100,12 +100,9 @@ mkdir /etc/net/ifaces/xxx
 ```
 BOOTPROTO=static
 TYPE=eth
-CONFIG_WIRELESS=no
-SYSTEMD_BOOTPROTO=static
 CONFIG_IPV4=yes
 DISABLED=no
 NM_CONTROLLED=no
-SYSTEMD_CONTROLLED=no
 ```
 После этого задается нужный адрес на интрефейс:  
 ```
@@ -134,10 +131,11 @@ ip a
 systemctl disable network.service NetworkManager
 ```
 
-Для HQ-RTR создаём 2 коталога под интерфейсы c vlan `100` и `200` 
+Для HQ-SRV создаём коталог под интерфейсы c vlan `100`  
 ```
 mkdir /etc/net/ifaces/ens20.100 
 ```
+- для CLI `vlan 200`
 
 После чего создаём и настраиваем файл options:
 ```
@@ -146,14 +144,97 @@ HOST=ens20
 TYPE=vlan
 VID=100
 ```
-- `для друого интерфейса 200`
-
+- `для CLI ID 200`
 
 
 Также перезагружнаеи сетевую службу:  
 ```
 systemctl restart network
 ```
+
+Для настройки HQ-RTR скачиваем openvswitch: <small>делать после настройки NAT</small>
+```
+apt-get update && apt-get install openvswitch -y
+```
+
+Создаём интерфейсы для каждого SVI-интерфейса:
+```
+mkdir /etc/net/ifaces/vlan100
+mkdir /etc/net/ifaces/vlan200
+mkdir /etc/net/ifaces/vlan999
+```
+
+Создаём файл `options` в кадом и добовляем конфигурацию:
+```
+TYPE=ovsport
+BRIDGE=HQ-SW
+VID=100
+BOOTPROTO=static
+CONFIG_IPV4=yes
+```
+
+- `Аналогично для других интерфейсов 200 и 999`
+
+Полсе чего добовляем `ipv4address` и прописыем ip интерфейса в нём:
+```
+echo xxx.xxx.xxx.xxx/xx > /etc/net/ifaces/vlanxxx/ipv4address
+```
+
+Создаём директорию для виртуального коммутатора HQ-SW:
+```
+mkdir /etc/net/ifaces/HQ-SW
+```
+
+Добовляем конфигурационный файл options:
+```
+echo "TYPE=ovsbr " > /etc/net/ifaces/HQ-SW/options
+```
+
+Включаем и добавляем в автозагрузку службу openvswitch:
+```
+systemctl enable --now openvswitch
+```
+
+Перезагружаем службу network:
+```
+systemctl restart network
+```
+
+Включаем модуль ядра для поддержки стандарта IEEE 802.1Q:
+
+```
+modprobe 8021q
+echo "8021q" | tee -a /etc/modules
+```
+
+Включить ip-адресацию `/etc/net/sysctl.conf`
+```
+net.ipv4.ip_forward = 1
+```
+
+Приминить изменения
+```
+sudo sysctl -p
+```
+
+Отключаем автоматическое удаление настроек, заданных через ovs-vsctl в файле /etc/net/ifaces/default/options: меняем с yes на `no`
+```
+VS_REMOVE=no
+```
+
+перезапускаем службу network:
+```
+systemctl restart network
+```
+
+Средстами ovs-vcsl делаем интерфейс enp0s8 магистральным с разрешением пропускать опледелённые VLAN-ы:
+```
+ovs-vsctl add-prot HQ-SW ens20 trunk=100,200,999
+```
+
+Проверяем: `ovs-vsctl show`
+
+![image](https://github.com/user-attachments/assets/96750a69-1468-474b-a19d-9d8d09f16728)
 
 </details>
 
@@ -206,16 +287,6 @@ systemctl restart network
 
 <details>
     <summary>NAT с помощью iptables</summary>
-
-Включить ip-адресацию `/etc/net/sysctl.conf`
-```
-net.ipv4.ip_forward = 1
-```
-
-Приминить изменения
-```
-sudo sysctl -p
-```
 
 Интерфейсы:
 - `eth0` - внешний интерфейс
